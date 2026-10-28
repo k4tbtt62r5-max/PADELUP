@@ -105,6 +105,9 @@ body.ad-on .toast{bottom:calc(var(--navh,72px) + var(--adh,50px) + 36px)}
 .legal .box{background:#eef3ff;border-radius:12px;padding:10px 12px}
 .todo{display:inline;background:#fff3cd;color:#6b4a00;border-radius:6px;padding:1px 6px;font-size:13px;font-weight:600}
 .lnav{display:flex;gap:8px;flex-wrap:wrap}.lnav button{flex:1 1 auto;padding:10px 6px;border:1px solid var(--br);background:#fff;border-radius:12px;font-weight:700;font-size:13px;color:var(--tx)}
+body.gated .hero .chip,body.gated #hsc,body.gated #protohint,body.gated #tabs,body.gated #nav{display:none!important}
+body.gated .hero{padding-bottom:22px}body.gated .wrap{margin-top:16px}
+.feat{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin:12px 0 4px}.feat span{background:#eef3ff;color:#1f4fff;border-radius:999px;padding:5px 10px;font-size:12px;font-weight:700}
 </style>
 </head>
 <body>
@@ -251,7 +254,7 @@ function renderCore(){
     return `<div class="card post"><div class="hd">${av(wp,40)}<div><b>${esc(tn(m,"w"))}</b> schlägt ${esc(tn(m,"l"))}<div class="sub">${esc(m.d)}${m.sc?" · "+esc(m.sc):""}</div></div></div>${m.img?`<div class="win"><img class="ph" src="${m.img}" alt="Siegerfoto"><span class="badge">🏆 Sieger</span></div>`:""}${m.img2?`<img class="thumb" src="${m.img2}" alt="Matchfoto">`:""}${m.status=="pending"?pendUI(m):""}<div class="ft"><span class="sub">${m.dw!=null?"Level: "+slots(m).map(([n,id])=>esc(n)+(id!=null&&delta(m,id)!=null?" "+sg(delta(m,id)):"")).join(" · "):`+3 P ${esc(tn(m,"w"))} · +1 P ${esc(tn(m,"l"))}`}</span><span style="display:flex;gap:6px"><button class="like" onclick="reportM(${jid(m.id)})" aria-label="Beitrag melden">⚑ Melden</button><button class="like ${m.liked?"on":""}" onclick="like(${jid(m.id)})">${m.liked?"❤️":"🤍"} ${m.likes||0}</button></span></div></div>`}).join("")+(ms.length>feedMax?`<button class="btn ghost" onclick="feedMax+=10;render()">Mehr anzeigen</button>`:""):`<div class="empty">Noch keine Matches in dieser Liga.<br>Trag das erste ein und poste ein Siegerfoto!</div>`;
   const opts=ps.map(p=>`<option value="${p.id}">${esc(p.name)}</option>`).join("");
   ["w","l","w2","l2"].forEach((i,k)=>{const e=document.getElementById(i),v=e.value;e.innerHTML=opts;if(v&&ps.some(p=>p.id==v))e.value=v;else if(ps.length>k)e.selectedIndex=[0,1,2,3][k]});modeUi();
-  renderHalls();if(view=="more")renderMore();if(view=="legal")renderLegal();if(view=="login")renderLogin();if(view=="admin")renderAdmin();if(view=="owner")renderOwner();if(view=="adinfo")renderAdInfo();if(view=="blocked")renderBlocked();if(view=="prem")renderPrem();if(view=="season")renderSeason();else updHero();if(view=="profile")renderProfile();const sub={add:"more",pts:"more",prem:"more",legal:"more",blocked:"more",halls:"rank",profile:"rank",login:(NATIVE&&SB.live&&!A.session)?"":"more",adinfo:"more",admin:ADM.hall?"owner":"more",owner:"more"}[view],bk=document.getElementById("back");bk.classList.toggle("hide",!sub);bk.onclick=()=>{view=sub;render()};["rank","feed","add","res","pts","prem","halls","season","profile","more","legal","blocked","login","adinfo","admin","owner"].forEach(v=>document.getElementById(v).classList.toggle("hide",v!=view));
+  renderHalls();if(view=="more")renderMore();if(view=="legal")renderLegal();if(view=="login")renderLogin();if(view=="admin")renderAdmin();if(view=="owner")renderOwner();if(view=="adinfo")renderAdInfo();if(view=="blocked")renderBlocked();if(view=="prem")renderPrem();if(view=="season")renderSeason();else updHero();if(view=="profile")renderProfile();const sub={add:"more",pts:"more",prem:"more",legal:"more",blocked:"more",halls:"rank",profile:"rank",login:(SB.live&&!A.session)?"":"more",adinfo:"more",admin:ADM.hall?"owner":"more",owner:"more"}[view],bk=document.getElementById("back");bk.classList.toggle("hide",!sub);bk.onclick=()=>{view=sub;render()};["rank","feed","add","res","pts","prem","halls","season","profile","more","legal","blocked","login","adinfo","admin","owner"].forEach(v=>document.getElementById(v).classList.toggle("hide",v!=view));
   const grp={rank:1,feed:1,res:1,season:1}[view]?view:(["add","pts","prem","more","legal","blocked","login","adinfo","admin","owner"].includes(view)?"more":"");document.querySelectorAll("#nav button").forEach(b=>b.classList.toggle("on",b.dataset.v==grp));
 }
 function renderList(){
@@ -380,7 +383,7 @@ const SEC_READY=(async()=>{const P=secPlugin();let ls=null;try{ls=localStorage.g
 const APPLE_SVG="<svg viewBox='0 0 24 24' aria-hidden='true'><path d='M12.152 6.896c-.948 0-2.415-1.078-3.96-1.04-2.04.027-3.91 1.183-4.961 3.014-2.117 3.675-.546 9.103 1.519 12.09 1.013 1.454 2.208 3.09 3.792 3.039 1.52-.065 2.09-.987 3.935-.987 1.831 0 2.35.987 3.96.948 1.637-.026 2.676-1.48 3.676-2.948 1.156-1.688 1.636-3.325 1.662-3.415-.039-.013-3.182-1.221-3.22-4.857-.026-3.04 2.48-4.494 2.597-4.559-1.429-2.09-3.623-2.324-4.39-2.376-2-.156-3.675 1.09-4.61 1.09zM15.53 3.83c.843-1.012 1.4-2.427 1.245-3.83-1.207.052-2.662.805-3.532 1.818-.78.896-1.454 2.338-1.273 3.714 1.338.104 2.715-.688 3.559-1.701'/></svg>";
 function saveSess(x){A.session=x;const P=secPlugin();if(P){(x?P.set({key:'padel_auth',value:JSON.stringify(x)}):P.remove({key:'padel_auth'})).catch(()=>{});return}try{x?localStorage.setItem('padel_auth',JSON.stringify(x)):localStorage.removeItem('padel_auth')}catch(e){}}
 function setSess(j){const x={access_token:j.access_token,refresh_token:j.refresh_token,expires_at:j.expires_at||Math.floor(Date.now()/1000)+(j.expires_in||3600),user:j.user||(A.session&&A.session.user)||null};saveSess(x);return x}
-function gate(){if(NATIVE&&SB.live&&!A.session&&view!='login'&&view!='legal')view='login'}
+function gate(){if(SB.live&&!A.session&&view!='login'&&view!='legal')view='login'}
 async function sbFetch(path,o){o=o||{};if(!SB.live)return{ok:false,status:0,error:'not_configured'};
  try{const r=await fetch(SB.url+path,{method:o.method||'GET',headers:Object.assign({apikey:SB.anon,'Content-Type':'application/json',Authorization:'Bearer '+(o.token||SB.anon)},o.headers||{}),body:o.body?JSON.stringify(o.body):undefined});
   let j=null;try{j=await r.json()}catch(e){}return{ok:r.ok,status:r.status,json:j}}catch(e){return{ok:false,status:0,error:'network'}}}
@@ -425,7 +428,7 @@ async function appleLogin(){if(!SB.live){msg(authErr({error:'not_configured'}));
   setSess(r.json);const nm=[a.r.givenName,a.r.familyName].filter(Boolean).join(' ');if(nm){RM.suggest=nm.slice(0,30);if(!S.me.name)S.me.name=RM.suggest}   /* Apple liefert den Namen nur beim ersten Mal */
   await afterLogin()}finally{window._ab=false}}
 async function logout(){await pushOff();const t=A.session&&A.session.access_token;if(t)await sbFetch('/auth/v1/logout',{method:'POST',token:t});saveSess(null);RM.ready=false;RM.hall=null;localReset();S.premium=false;save();
- try{if(BILLING.live)await BILLING.plugin.logOut()}catch(e){}view=(NATIVE&&SB.live)?'login':'rank';render();toast('Abgemeldet')}
+ try{if(BILLING.live)await BILLING.plugin.logOut()}catch(e){}view=SB.live?'login':'rank';render();toast('Abgemeldet')}
 async function serverDelete(){const t=await freshToken();if(!t){msg('Bitte melde dich erneut an und versuche es noch einmal.');return false}
  const u=A.session.user||{};let appleCode=null;
  if((u.identities||[]).some(i=>i.provider=='apple')||(u.app_metadata&&u.app_metadata.provider=='apple')){
@@ -437,10 +440,10 @@ function accountCard(){const x=A.session;
  if(!x)return SB.live?`<div class='card'><b>Du bist nicht angemeldet</b><div class='sub' style='margin:6px 0 10px'>Melde dich an, damit dein Konto und Premium gesichert sind.</div><button class='btn' onclick="view='login';render()">Anmelden</button></div>`:'';
  const em=(x.user&&x.user.email)||'',relay=/privaterelay\.appleid\.com$/i.test(em);
  return `<div class='card'><b>Angemeldet</b><div class='sub' style='margin:4px 0 8px'>${esc(em||'Apple-Konto')}${relay?' (Apple-Weiterleitung, deine echte E-Mail bleibt privat)':''}</div><button class='btn ghost' style='margin:0' onclick='logout()'>Abmelden</button></div>`}
-function renderLogin(){const live=SB.live,gateOn=NATIVE&&live;
- document.getElementById('login').innerHTML=`<div class='card'><div style='text-align:center'><div style='font-size:40px'>🎾</div><h3 style='font-size:22px;margin:4px 0'>PADELUP</h3><div class='sub'>Melde dich an, um deine Rangliste zu nutzen.</div></div>
-<button class='apple' onclick='appleLogin()'>${APPLE_SVG}<span>Mit Apple anmelden</span></button>
-<div class='sub' style='text-align:center;margin:14px 0 4px'>oder mit E-Mail</div>
+function renderLogin(){const live=SB.live,gateOn=live;
+ document.getElementById('login').innerHTML=`<div class='card'><div style='text-align:center'><div style='font-size:40px'>🎾</div><h3 style='font-size:22px;margin:4px 0'>PADELUP</h3><div class='sub'>${gateOn?'Die Rangliste deiner Padel-Halle. Erstelle ein Konto oder melde dich an. Danach trittst du mit dem Code deiner Halle bei.':'Melde dich an, um deine Rangliste zu nutzen.'}</div>${gateOn?`<div class='feat'><span>🏆 Rookie · Smash · Elite</span><span>📅 4-Wochen-Saisons</span><span>📸 Siegerfotos</span></div>`:''}</div>
+${(NATIVE||(window.Capacitor&&Capacitor.Plugins&&Capacitor.Plugins.SignInWithApple))?`<button class='apple' onclick='appleLogin()'>${APPLE_SVG}<span>Mit Apple anmelden</span></button>
+<div class='sub' style='text-align:center;margin:14px 0 4px'>oder mit E-Mail</div>`:''}
 <label>E-Mail</label><input id='ae' type='email' inputmode='email' autocomplete='email' autocapitalize='none'>
 <label>Passwort (mind. 8 Zeichen)</label><input id='ap' type='password' autocomplete='current-password'>
 <button class='btn' onclick='emailLogin()'>Anmelden</button><button class='btn ghost' onclick='emailSignup()'>Konto erstellen</button>
@@ -514,7 +517,7 @@ AD.hidden=lsGet('padel_adhid',[]);AD.cap=lsGet('padel_adcap',{});AD.queue=lsGet(
 const DEMO_CAMPS=[{id:'demo-1',advertiser:'Beispiel: Padel Sport Shop',headline:'10 % auf alle Schläger',body:'Nur diese Woche. Zeige diese Anzeige an der Kasse.',image_url:null,cta_label:'Mehr erfahren',cta_url:'https://example.com/'},{id:'demo-2',advertiser:'Beispiel: Padelhalle Nord',headline:'Schnupperkurs für Einsteiger',body:'Jeden Samstag um 10 Uhr. Schläger werden gestellt.',image_url:null,cta_label:'Termin ansehen',cta_url:'https://example.com/'}];
 const ADREASONS=['Unangemessen oder anstößig','Irreführend oder Betrug','Zu aufdringlich oder störend','Falsche oder gefährliche Zielseite','Sonstiges'];
 function adPlugin(){return(window.Capacitor&&window.Capacitor.Plugins&&window.Capacitor.Plugins.AdMob)||null}
-function adsOn(){return !AD.wait&&!S.premium&&!(NATIVE&&SB.live&&!A.session)&&view!='login'}
+function adsOn(){return !AD.wait&&!S.premium&&!(SB.live&&!A.session)&&view!='login'}
 function modalClosed(){return document.getElementById('modal').classList.contains('hide')}
 function wantBanner(){return adsOn()&&ADS.bannerViews.includes(view)&&modalClosed()}
 function httpsOk(u){try{return new URL(u).protocol==='https:'}catch(e){return false}}
@@ -537,7 +540,7 @@ function setAdUi(){const web=AD.demo&&!NATIVE&&wantBanner(),vis=!!((NATIVE&&AD.v
  if(document.documentElement)document.documentElement.style.setProperty('--adh',(vis?(web?50:(AD.adh||50)):0)+'px');
  if(document.body)document.body.classList.toggle('ad-on',vis);
  document.getElementById('adbar').classList.toggle('hide',!vis);document.getElementById('demobanner').classList.toggle('hide',!web)}
-function afterRender(){injectFeedAds();syncBanner()}
+function afterRender(){document.body.classList.toggle('gated',SB.live&&!A.session);injectFeedAds();syncBanner()}
 async function loadAds(){if(AD.demo&&!NATIVE){AD.camps=DEMO_CAMPS.slice();return}
  if(!SB.live||!A.session){AD.camps=[];return}const t=await freshToken();if(!t)return;
  const r=await sbFetch('/rest/v1/ad_campaigns?select=id,advertiser,headline,body,image_url,cta_label,cta_url&order=created_at.desc&limit=10',{token:t});
