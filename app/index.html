@@ -243,7 +243,7 @@ function write(f){const used=new Set();const j=JSON.stringify(S,(k,v)=>{if((k=="
 function save(){if(isR())return true;dbSave();try{write();return true}catch(e){if(e&&(e.name==='QuotaExceededError'||e.code===22)&&!DBS.db)return shed();if(DBS.checked&&!DBS.db&&!DBS.warn){DBS.warn=1;setTimeout(()=>toast('Hinweis: Diese Ansicht kann gerade nicht dauerhaft speichern.'),0)}return true}}
 function sweep(){const keep=new Set(),ref=o=>{for(const k of["img","img2"]){const v=o[k];if(typeof v=="string"){const id=PHM.get(v);if(id)keep.add(id)}}};S.matches.forEach(ref);S.players.forEach(ref);const del=[];for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k&&k.startsWith(PH)&&!keep.has(k.slice(PH.length)))del.push(k)}del.forEach(k=>localStorage.removeItem(k))}
 function shed(){try{sweep()}catch(e){return true}msg("Speicher voll – ältere Fotos werden entfernt, damit nichts verloren geht.");S.matches.forEach(m=>{m.img2=null});try{sweep();write(1);return true}catch(e){}S.matches.slice(0,-10).forEach(m=>{m.img=null});try{sweep()}catch(e){}try{write(1);return true}catch(e){msg("Speichern nicht möglich. Bitte Browser-Speicher freigeben.");return false}}
-function reloadS(){const o=loadS();if(!sane(o))return;S=o;ensureLv();if(!S.halls.some(h=>h.id==S.hall))S.hall=S.halls[0].id;render()}
+function reloadS(){if(SB.live)return;const o=loadS();if(!sane(o))return;S=o;ensureLv();if(!S.halls.some(h=>h.id==S.hall))S.hall=S.halls[0].id;render()}
 function mine(){return S.players.find(x=>x.id==S.me.pid)||null}
 function cmp(a,b){return b.pts-a.pts||b.w-a.w||a.name.localeCompare(b.name)}
 function toast(t){const e=document.getElementById("toast");e.textContent=t;e.className="toast show";clearTimeout(window._tt);window._tt=setTimeout(()=>{e.className="toast"},2500)}
@@ -395,6 +395,8 @@ function emptyS(){const d=seedAll();d.players=[];d.matches=[];d.history=[];d.hal
 const BILLING={key:'',ent:'premium',get plugin(){return(window.Capacitor&&window.Capacitor.Plugins&&window.Capacitor.Plugins.Purchases)||null},get live(){return !!(this.plugin&&this.key)}};
 let OFF=null;
 const SB={url:'https://qnvevifgvplmqpwzsuca.supabase.co',anon:'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFudmV2aWZndnBsbXFwd3pzdWNhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTMxNzk4OTgsImV4cCI6MjEwODc1NTg5OH0.wbgfCuaolPsjObiPoK5EoBChsSGM4dw6rdGutbvvmm4',get live(){return !!(this.url&&this.anon)}};
+/* Mit Server: keine Vorschau-/Beispieldaten anzeigen, bis die echten Daten geladen sind */
+if(SB.live){const k={premium:S.premium,onb:S.onb,consent:S.consent,reports:S.reports};S=Object.assign(emptyS(),k,{halls:[{id:'none',name:'Wird geladen …',none:true}],hall:'none'})}
 const APPLE={clientId:'',redirect:''};
 let A={session:null};
 /* Login-Daten: in der App im iOS-Schlüsselbund (Keychain), im Browser im lokalen Speicher */
