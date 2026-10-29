@@ -1477,8 +1477,9 @@ function saveSess(x){A.session=x;const P=secPlugin();if(P){(x?P.set({key:'padel_
 function setSess(j){const x={access_token:j.access_token,refresh_token:j.refresh_token,expires_at:j.expires_at||Math.floor(Date.now()/1000)+(j.expires_in||3600),user:j.user||(A.session&&A.session.user)||null};saveSess(x);return x}
 function gate(){if(SB.live&&!A.session&&view!='login'&&view!='legal')view='login'}
 async function sbFetch(path,o){o=o||{};if(!SB.live)return{ok:false,status:0,error:'not_configured'};
- try{const r=await fetch(SB.url+path,{method:o.method||'GET',headers:Object.assign({apikey:SB.anon,'Content-Type':'application/json',Authorization:'Bearer '+(o.token||SB.anon)},o.headers||{}),body:o.body?JSON.stringify(o.body):undefined});
-  let j=null;try{j=await r.json()}catch(e){}return{ok:r.ok,status:r.status,json:j}}catch(e){return{ok:false,status:0,error:'network'}}}
+ let ac=null,tm=null;try{if(o.timeout&&window.AbortController){ac=new AbortController();tm=setTimeout(()=>ac.abort(),o.timeout)}}catch(e){}
+ try{const r=await fetch(SB.url+path,{signal:ac?ac.signal:undefined,method:o.method||'GET',headers:Object.assign({apikey:SB.anon,'Content-Type':'application/json',Authorization:'Bearer '+(o.token||SB.anon)},o.headers||{}),body:o.body?JSON.stringify(o.body):undefined});
+  let j=null;try{j=await r.json()}catch(e){}clearTimeout(tm);return{ok:r.ok,status:r.status,json:j}}catch(e){clearTimeout(tm);return{ok:false,status:0,error:(ac&&ac.signal.aborted)?'timeout':'network'}}}
 function authErr(r){const j=r.json||{},c=j.error_code||j.code||'',m=j.msg||j.message||j.error_description||'';
  if(r.error=='not_configured')return'Das Konto-System ist noch nicht eingerichtet. Anmelden ist erst nach der Einrichtung des Servers möglich.';
  if(r.error=='network'||r.status===0)return'Keine Verbindung. Bitte prüfe dein Internet und versuche es erneut.';
@@ -1843,12 +1844,15 @@ function renderOwner(){const el=document.getElementById('owner');if(!isR()||!RM.
  +(OWN.members===null?`<div class='card center'><div class='sub'>⏳ Mitglieder werden geladen …</div></div>`:`<div class='card'><h3>Mitglieder</h3>`+OWN.members.map(m=>{const id=safeId(m.user_id),me=m.user_id==A.session.user.id;
   return `<div style='padding:10px 0;border-bottom:1px solid var(--br)'><div style='display:flex;align-items:center;gap:8px'><div class='nm'>${esc(m.display_name)} ${m.is_owner?`<span class='pill'>Betreiber</span>`:''} ${m.role=='admin'?`<span class='pill' style='background:#dfe8ff;color:#1f4fff'>Hallen-Admin</span>`:''} ${m.suspended?`<span class='pill' style='background:#ffe1e1;color:#a30000'>Gesperrt</span>`:''}<div class='sub'>${esc(m.email||'')} · ${esc(String(m.league||'').replace(/^./,c=>c.toUpperCase()))} · ${m.points} P</div></div></div>`
   +(me||m.is_owner?'':`<div style='display:flex;flex-wrap:wrap;gap:6px;margin-top:8px'><button class='like' onclick="ownRole('${id}','${m.role=='admin'?'player':'admin'}')">${m.role=='admin'?'Admin entziehen':'Zum Admin machen'}</button><button class='like' onclick="ownLevel('${id}')">Level ${fmt(m.level)}</button><button class='like' onclick="ownRemove('${id}')">Aus Halle entfernen</button><button class='like' onclick="ownSuspend('${id}',${m.suspended?'false':'true'})">${m.suspended?'Entsperren':'Sperren'}</button><button class='like danger' onclick="ownDelete('${id}')">Konto löschen</button></div>`)+`</div>`}).join('')+`</div>`)}
-async function ownRun(fn,ok){if(OWN.busy)return;OWN.busy=true;try{await fn();toast(ok);await ownLoad();await remoteLoad()}catch(e){msg(e.message||'Das hat nicht geklappt.')}finally{OWN.busy=false;render()}}
+async function ownRun(fn,ok){if(OWN.busy){toast('⏳ Bitte warten, die letzte Aktion läuft noch …');return}OWN.busy=true;sheet(`<div class='center' style='padding:10px 0'><div style='font-size:28px'>⏳</div><b>Wird ausgeführt …</b><div class='sub'>Das kann einige Sekunden dauern.</div></div>`);try{await fn();closeM();toast(ok);await ownLoad();await remoteLoad()}catch(e){msg(e.message||'Das hat nicht geklappt.')}finally{OWN.busy=false;render()}}
 function ownName(id){const m=(OWN.members||[]).find(x=>safeId(x.user_id)==id);return m?m.display_name:'diese Person'}
 async function ownRole(id,r){if(!await ask(r=='admin'?`${ownName(id)} zum Hallen-Admin machen?`:`${ownName(id)} die Admin-Rechte entziehen?`,'Bestätigen'))return;ownRun(()=>rpc('owner_set_role',{p_hall:OWN.hall,p_user:id,p_role:r}),'Rolle geändert')}
 function ownRemove(id){sheet(`<h3>${esc(ownName(id))} aus der Halle entfernen</h3><label class='chk'><input type='checkbox' id='oban'><span>Erneuten Beitritt verhindern</span></label><button class='btn dng' onclick="ownRemoveGo('${id}')">Entfernen</button><button class='btn ghost' onclick='closeM()'>Abbrechen</button>`)}
 function ownRemoveGo(id){const b=document.getElementById('oban').checked;closeM();ownRun(()=>rpc('owner_remove_member',{p_hall:OWN.hall,p_user:id,p_ban:b}),'Aus der Halle entfernt')}
-async function ownAccount(body){const t=await freshToken();const r=await sbFetch('/functions/v1/owner-account',{method:'POST',token:t,body});if(!r.ok)throw new Error((r.json&&r.json.error)||srvErr(r))}
+async function ownAccount(body){const t=await freshToken();if(!t)throw new Error('Bitte melde dich erneut an.');const r=await sbFetch('/functions/v1/owner-account',{method:'POST',token:t,body,timeout:45000});
+ if(r.error=='timeout')throw new Error('Der Server hat nicht rechtzeitig geantwortet. Bitte lade die Seite neu und prüfe, ob die Aktion trotzdem ausgeführt wurde.');
+ if(r.error=='network')throw new Error('Keine Verbindung zum Server. Bitte prüfe dein Internet.');
+ if(!r.ok)throw new Error((r.json&&(r.json.error||r.json.message||r.json.msg))||('Server-Fehler '+r.status+'. '+srvErr(r)))}
 function ownSuspend(id,on){if(!on){ask(`${ownName(id)} entsperren?`,'Entsperren').then(y=>{if(y)ownRun(()=>ownAccount({action:'unsuspend',user:id}),'Entsperrt')});return}
  sheet(`<h3>${esc(ownName(id))} sperren</h3><div class='sub' style='margin-bottom:6px'>Die Person kann sich nicht mehr anmelden und erhält diesen Grund als Begründung.</div><input id='orsn' maxlength='300' placeholder='Grund, z. B. Beleidigungen trotz Verwarnung'><button class='btn dng' onclick="ownSuspendGo('${id}')">Sperren</button><button class='btn ghost' onclick='closeM()'>Abbrechen</button>`)}
 function ownSuspendGo(id){const r=document.getElementById('orsn').value.trim();if(r.length<3){msg('Bitte einen Grund angeben.');return}closeM();ownRun(()=>ownAccount({action:'suspend',user:id,reason:r}),'Konto gesperrt')}
@@ -2046,7 +2050,7 @@ function themeSet(t){lsSet('padel_theme',t);themeApply();render()}
 try{matchMedia('(prefers-color-scheme: dark)').addEventListener('change',()=>{if(themeGet()=='auto')themeApply()})}catch(e){}
 function themeCard(){const t=themeGet(),b=(k,l)=>`<button type="button" class="${t==k?'on':''}" onclick="themeSet('${k}')">${l}</button>`;return `<div class="card"><h3>🌓 Darstellung</h3><div class="thm">${b('auto','Automatisch')}${b('light','☀️ Hell')}${b('dark','🌙 Dunkel')}</div><div class="sub" style="margin-top:6px">„Automatisch“ folgt der Einstellung deines iPhones.</div></div>`}
 /* ===== Automatische Aktualisierung (nur Website-Version): neue Version erkennen und neu laden ===== */
-const APP_VERSION='20261029-143740';
+const APP_VERSION='20261029-173249';
 async function updCheck(){if(NATIVE||!SB.live||APP_VERSION=='dev'||document.hidden)return;
  try{const r=await fetch('version.json?ts='+Date.now(),{cache:'no-store'});if(!r.ok)return;const v=(await r.json()).v;if(!v||v==APP_VERSION)return;
   let tried=null;try{tried=sessionStorage.getItem('padel_upd')}catch(e){}if(tried==v)return;
