@@ -72,7 +72,9 @@ h3{margin:0 0 8px;font-size:16px}
 .center{text-align:center}
 .pill{display:inline-block;background:var(--lime);color:var(--lt);border-radius:20px;padding:3px 10px;font-weight:800;font-size:12px}
 #nav{position:fixed;left:0;right:0;bottom:0;margin:0 auto;max-width:560px;border-radius:18px 18px 0 0;padding:6px 6px calc(6px + env(safe-area-inset-bottom,0px));box-shadow:0 -4px 16px rgba(14,27,61,.12);z-index:10;overflow:visible;background:var(--card)}
-#nav button{flex:1;min-height:56px;padding:6px 2px;font-size:11px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;border-radius:12px;background:none;color:var(--mu)}
+#nav button .nb{position:absolute;top:3px;left:calc(50% + 6px);min-width:17px;height:17px;padding:0 4px;border-radius:9px;background:var(--rd);color:#fff;font-size:10px;font-weight:800;line-height:17px;font-style:normal}
+.qrbox{background:#fff;border-radius:14px;padding:10px;display:inline-block;line-height:0}.qrbox svg{display:block}
+#nav button{position:relative;flex:1;min-height:56px;padding:6px 2px;font-size:11px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;border-radius:12px;background:none;color:var(--mu)}
 #nav button i{font-style:normal;font-size:20px;line-height:1}
 #nav button.on{background:var(--tint);color:var(--blt)}
 #nav button.cta i{background:var(--lime);border-radius:50%;width:34px;height:34px;display:flex;align-items:center;justify-content:center;font-size:18px}
@@ -304,7 +306,7 @@ function renderCore(){
   document.getElementById("tabs").innerHTML=LEAGUES.map(l=>`<button class="${l.id==cur?"on":""}" onclick="cur='${l.id}';render()">${l.name}${(mine()&&mine().league==l.id&&mine().hall==S.hall)?" ⭐":""}<small>${l.range}</small></button>`).join("");
   const ps=sorted(),ms=S.matches.filter(m=>inLg(m,cur)&&m.hall==S.hall&&m.status!="rejected"&&!hidden(m)).slice().reverse();
   const top=ps.slice(0,3);
-  let h=ovtCard()+myCard()+`<div class="stats"><div class="stat"><b>${ps.length}</b><span>Spieler</span></div><div class="stat"><b>${ms.length}</b><span>Matches</span></div><div class="stat"><b>${ps[0]&&ps[0].pts?esc(ps[0].name):"–"}</b><span>Platz 1</span></div></div>`;
+  let h=confCard()+ovtCard()+myCard()+`<div class="stats"><div class="stat"><b>${ps.length}</b><span>Spieler</span></div><div class="stat"><b>${ms.length}</b><span>Matches</span></div><div class="stat"><b>${ps[0]&&ps[0].pts?esc(ps[0].name):"–"}</b><span>Platz 1</span></div></div>`;
   if(top.length){
     const order=top.length>=3?[1,0,2]:top.length==2?[1,0]:[0];
     h+=`<div class="card podium">`+order.map(i=>{const p=top[i];return `<div class="pd p${i+1}" onclick="openP(${jid(p.id)})"><span class="crown">${i==0?"👑":""}</span>${av(p,i==0?64:52)}<div class="nmx">${esc(p.name)}${star(p)}</div><small>${p.pts} P</small><div class="bar">${i+1}</div></div>`}).join("")+`</div>`;
@@ -409,7 +411,7 @@ function renderSeason(){updHero();const s=S.season,pct=Math.round(Math.min(100,M
 const hist=S.history.map(se=>{const hs=se.halls[S.hall]||{};const rows=LEAGUES.map(L=>{const r=hs[L.id];return r?`<div style='margin-top:8px'><span class='pill'>${L.name}</span> 🥇 <b>${esc(r[0].name)}</b> · ${r[0].pts} P<div class='sub'>${r.map((x,i)=>(i+1)+'. '+esc(x.name)+' ('+x.pts+')').join(' · ')}</div></div>`:''}).join('');return `<div class='card'><b>Saison ${sno(se)}</b> <span class='sub'>${fd(se.start)} – ${fd(se.end)}</span>${rows||`<div class='sub'>Keine Ergebnisse in dieser Halle</div>`}</div>`}).join('')||`<div class='empty'>Noch keine abgeschlossene Saison</div>`;
 document.getElementById('season').innerHTML=`<div class='card center'><span class='pill'>Saison ${sno(s)}</span><div style='font-size:26px;font-weight:800;color:var(--blt);margin:10px 0 4px'>${left(Math.max(0,s.end-Date.now()))}</div><div class='sub'>bis zum Saisonende</div><div style='height:10px;background:var(--soft);border-radius:8px;margin:12px 0 6px'><div style='height:10px;width:${pct}%;background:var(--lime);border-radius:8px'></div></div><div class='sub'>${fd(s.start)} → ${fd(s.end)} · 28 Tage</div></div><div class='card'><h3>So läuft eine Saison</h3><div class='sub' style='font-size:14px;color:var(--tx);line-height:1.6'><b>Woche 1–4: Saison läuft.</b> Spieler sammeln Ranglistenpunkte, auch in Spielen gegen andere Ligen. Wer gespielt hat, bleibt bis Saisonende in seiner Liga.<br><b>Nach 28 Tagen: Reset.</b> Die Saison wird archiviert, die Punkte starten bei null und alle werden nach ihrem Playtomic-Level neu eingeteilt (Rookie bis 1,5 · Smash 1,5–2,7 · Elite ab 2,7).<br><b>Neue Saison:</b> Beim ersten Öffnen bestätigst du kurz dein Level, dann geht es wieder um Platz 1.</div></div><h3 style='margin:4px 4px 8px'>Saisonhistorie · ${esc(curHall().name)}</h3>${hist}${(NATIVE||isR())?'':`<div class='card'><div class='sub' style='margin-bottom:8px'>Demo-Werkzeuge (nur Vorschau)</div><button class='btn ghost' style='margin:0 0 8px' onclick='simSeason()'>Saisonende simulieren (Demo)</button><button class='btn ghost' style='margin:0' onclick='resetAll()'>Beispieldaten zurücksetzen</button><button class='btn ghost' style='margin:8px 0 0' onclick='toggleAdDemo()'>Beispiel-Werbung ${AD.demo?'aus':'ein'}schalten (nur Vorschau)</button></div>`}`}
 function renderProfile(){const me=S.me,p=S.players.find(x=>x.id==me.pid);
-let h=themeCard()+accountCard()+modCard()+pushCard()+(S.premium&&p?`<div class='card'><label class='chk' style='margin:0'><input type='checkbox' id='shst' ${starOn()?'checked':''} onchange='setStar(this.checked)'><span>⭐ Premium-Stern in Rangliste und Profil zeigen</span></label></div>`:'')+`<div class='card'><h3>👤 Mein Profil</h3><label>Name</label><input id='mn' value='${esc(me.name)}' maxlength='30'><label>E-Mail</label><input id='mem' type='email' inputmode='email' value='${esc(me.email||(A.session&&A.session.user&&A.session.user.email)||'')}' maxlength='60'>${p&&p.no?`<div class='sub' style='margin:-2px 0 8px'>Deine Spielernummer: <b style='color:var(--tx)'>#${esc(p.no)}</b> – damit finden dich Mitspieler.</div>`:''}<label>Mein Playtomic-Level (0–7)</label><input id='ml' inputmode='decimal' value='${p?fmt(p.lv):''}' placeholder='z. B. 2,4'><div class='sub' style='margin:-4px 0 10px;line-height:1.5'>Trag dein aktuelles Level aus Playtomic ein. Es bestimmt deine Liga. Ändern wirkt sofort, solange du in dieser Saison noch nicht gespielt hast, sonst ab der nächsten Saison. Wechsel in eine niedrigere Liga gibt der Hallen-Admin frei.${isR()&&RM.ss&&RM.ss.pending_level!=null?`<br><b style='color:#8a5a00'>Angefragt: ${fmt(RM.ss.pending_level)} – wartet auf Freigabe.</b>`:''}</div>${p?'':`<label class='chk'><input type='checkbox' id='tos'><span>Ich akzeptiere die <span class='lnk' onclick="view='legal';render()">Nutzungsbedingungen</span> und die <span class='lnk' onclick="view='legal';render()">Datenschutzerklärung</span>.</span></label><label class='chk'><input type='checkbox' id='age'><span>Ich bin mindestens 16 Jahre alt.</span></label>`}<button class='btn' onclick='saveProfile()'>Speichern</button>${NATIVE||isR()?'':`<div class='sub' style='margin-top:8px'>${SB.live?'Nicht angemeldet: Diese Angaben bleiben nur auf diesem Gerät. Melde dich oben an, damit sie auf dem Server gespeichert werden.':'Vorschau: Deine E-Mail wird nur lokal auf diesem Gerät gespeichert.'}</div>`}</div>`;
+let h=(isR()&&!RM.profile?joinHint():'')+themeCard()+accountCard()+modCard()+pushCard()+(S.premium&&p?`<div class='card'><label class='chk' style='margin:0'><input type='checkbox' id='shst' ${starOn()?'checked':''} onchange='setStar(this.checked)'><span>⭐ Premium-Stern in Rangliste und Profil zeigen</span></label></div>`:'')+`<div class='card'><h3>👤 Mein Profil</h3><label>Name</label><input id='mn' value='${esc(me.name)}' maxlength='30'><label>E-Mail</label><input id='mem' type='email' inputmode='email' value='${esc(me.email||(A.session&&A.session.user&&A.session.user.email)||'')}' maxlength='60'>${p&&p.no?`<div class='sub' style='margin:-2px 0 8px'>Deine Spielernummer: <b style='color:var(--tx)'>#${esc(p.no)}</b> – damit finden dich Mitspieler.</div>`:''}<label>Mein Playtomic-Level (0–7)</label><input id='ml' inputmode='decimal' value='${p?fmt(p.lv):''}' placeholder='z. B. 2,4'><div class='sub' style='margin:-4px 0 10px;line-height:1.5'>Trag dein aktuelles Level aus Playtomic ein. Es bestimmt deine Liga. Ändern wirkt sofort, solange du in dieser Saison noch nicht gespielt hast, sonst ab der nächsten Saison. Wechsel in eine niedrigere Liga gibt der Hallen-Admin frei.${isR()&&RM.ss&&RM.ss.pending_level!=null?`<br><b style='color:#8a5a00'>Angefragt: ${fmt(RM.ss.pending_level)} – wartet auf Freigabe.</b>`:''}</div>${p?'':`<label class='chk'><input type='checkbox' id='tos'><span>Ich akzeptiere die <span class='lnk' onclick="view='legal';render()">Nutzungsbedingungen</span> und die <span class='lnk' onclick="view='legal';render()">Datenschutzerklärung</span>.</span></label><label class='chk'><input type='checkbox' id='age'><span>Ich bin mindestens 16 Jahre alt.</span></label>`}<button class='btn' onclick='saveProfile()'>Speichern</button>${NATIVE||isR()?'':`<div class='sub' style='margin-top:8px'>${SB.live?'Nicht angemeldet: Diese Angaben bleiben nur auf diesem Gerät. Melde dich oben an, damit sie auf dem Server gespeichert werden.':'Vorschau: Deine E-Mail wird nur lokal auf diesem Gerät gespeichert.'}</div>`}</div>`;
 if(p){const lst=S.players.filter(x=>x.hall==p.hall&&x.league==p.league).sort((a,b)=>b.pts-a.pts||b.w-a.w||a.name.localeCompare(b.name)),rk=lst.findIndex(x=>x.id==p.id)+1,L=LEAGUES.find(l=>l.id==p.league),nl=leagueOf(p.lv);
 h+=`<div class='card center'>${av(p,72)}<div style='font-size:30px;font-weight:800;color:var(--blt);margin-top:6px'>${fmt(p.lv)}</div><div class='sub'>Level (Hallen-Schätzwert)</div><div style='margin-top:8px'><span class='pill'>${L.name} · Platz ${rk} von ${lst.length}</span></div>${nl!=p.league?`<div class='sub' style='margin-top:8px'>Deine Liga bleibt bis Saisonende ${L.name}. Ab der nächsten Saison: <b>${LEAGUES.find(l=>l.id==nl).name}</b></div>`:''}</div>`;
 h+=`<div class='card'><h3>Aktuelle Rangliste · ${L.name}</h3>`+lst.slice(0,5).map((x,i)=>`<div class='row' style='cursor:default;${x.id==p.id?'background:var(--tint);border-radius:10px':''}'><div class='rk'>${i+1}</div>${av(x,32)}<div class='nm' style='font-size:14px'>${esc(x.name)}</div><div class='pt' style='font-size:14px'>${x.pts} P</div></div>`).join('')+`</div>`;
@@ -433,6 +435,1032 @@ function saveProfile(){if(isR())return rSaveProfile();
 function emptyS(){const d=seedAll();d.players=[];d.matches=[];d.history=[];d.halls=[{id:'h1',name:'Meine Halle'}];d.hall='h1';d.season={id:1,start:Date.now(),end:Date.now()+28*864e5};d.me={name:'',email:'',pid:null};return d}
 const BILLING={key:'',ent:'premium',get plugin(){return(window.Capacitor&&window.Capacitor.Plugins&&window.Capacitor.Plugins.Purchases)||null},get live(){return !!(this.plugin&&this.key)}};
 let OFF=null;
+/* QR-Code-Erzeugung: "QRCode for JavaScript" (c) 2009 Kazuhiko Arase, MIT-Lizenz, http://www.d-project.com/ – über qrcode-terminal (Apache-2.0). "QR Code" ist eine Marke der DENSO WAVE INCORPORATED. */
+const QRLIB=(function(){var M={},C={};function req(n){if(C[n])return C[n].exports;var m={exports:{}};C[n]=m;M[n](m,m.exports,req);return m.exports}
+M['./QR8bitByte']=function(module,exports,require){var QRMode = require('./QRMode');
+function QR8bitByte(data) {
+this.mode = QRMode.MODE_8BIT_BYTE;
+this.data = data;
+}
+QR8bitByte.prototype = {
+getLength : function() {
+return this.data.length;
+},
+write : function(buffer) {
+for (var i = 0; i < this.data.length; i++) {
+// not JIS ...
+buffer.put(this.data.charCodeAt(i), 8);
+}
+}
+};
+module.exports = QR8bitByte;
+};
+M['./QRBitBuffer']=function(module,exports,require){function QRBitBuffer() {
+this.buffer = [];
+this.length = 0;
+}
+QRBitBuffer.prototype = {
+get : function(index) {
+var bufIndex = Math.floor(index / 8);
+return ( (this.buffer[bufIndex] >>> (7 - index % 8) ) & 1) == 1;
+},
+put : function(num, length) {
+for (var i = 0; i < length; i++) {
+this.putBit( ( (num >>> (length - i - 1) ) & 1) == 1);
+}
+},
+getLengthInBits : function() {
+return this.length;
+},
+putBit : function(bit) {
+var bufIndex = Math.floor(this.length / 8);
+if (this.buffer.length <= bufIndex) {
+this.buffer.push(0);
+}
+if (bit) {
+this.buffer[bufIndex] |= (0x80 >>> (this.length % 8) );
+}
+this.length++;
+}
+};
+module.exports = QRBitBuffer;
+};
+M['./QRErrorCorrectLevel']=function(module,exports,require){module.exports = {
+L : 1,
+M : 0,
+Q : 3,
+H : 2
+};
+};
+M['./QRMaskPattern']=function(module,exports,require){module.exports = {
+PATTERN000 : 0,
+PATTERN001 : 1,
+PATTERN010 : 2,
+PATTERN011 : 3,
+PATTERN100 : 4,
+PATTERN101 : 5,
+PATTERN110 : 6,
+PATTERN111 : 7
+};
+};
+M['./QRMath']=function(module,exports,require){var QRMath = {
+glog : function(n) {
+if (n < 1) {
+throw new Error("glog(" + n + ")");
+}
+return QRMath.LOG_TABLE[n];
+},
+gexp : function(n) {
+while (n < 0) {
+n += 255;
+}
+while (n >= 256) {
+n -= 255;
+}
+return QRMath.EXP_TABLE[n];
+},
+EXP_TABLE : new Array(256),
+LOG_TABLE : new Array(256)
+};
+for (var i = 0; i < 8; i++) {
+QRMath.EXP_TABLE[i] = 1 << i;
+}
+for (var i = 8; i < 256; i++) {
+QRMath.EXP_TABLE[i] = QRMath.EXP_TABLE[i - 4]
+^ QRMath.EXP_TABLE[i - 5]
+^ QRMath.EXP_TABLE[i - 6]
+^ QRMath.EXP_TABLE[i - 8];
+}
+for (var i = 0; i < 255; i++) {
+QRMath.LOG_TABLE[QRMath.EXP_TABLE[i] ] = i;
+}
+module.exports = QRMath;
+};
+M['./QRMode']=function(module,exports,require){module.exports = {
+MODE_NUMBER :       1 << 0,
+MODE_ALPHA_NUM :    1 << 1,
+MODE_8BIT_BYTE :    1 << 2,
+MODE_KANJI :        1 << 3
+};
+};
+M['./QRPolynomial']=function(module,exports,require){var QRMath = require('./QRMath');
+function QRPolynomial(num, shift) {
+if (num.length === undefined) {
+throw new Error(num.length + "/" + shift);
+}
+var offset = 0;
+while (offset < num.length && num[offset] === 0) {
+offset++;
+}
+this.num = new Array(num.length - offset + shift);
+for (var i = 0; i < num.length - offset; i++) {
+this.num[i] = num[i + offset];
+}
+}
+QRPolynomial.prototype = {
+get : function(index) {
+return this.num[index];
+},
+getLength : function() {
+return this.num.length;
+},
+multiply : function(e) {
+var num = new Array(this.getLength() + e.getLength() - 1);
+for (var i = 0; i < this.getLength(); i++) {
+for (var j = 0; j < e.getLength(); j++) {
+num[i + j] ^= QRMath.gexp(QRMath.glog(this.get(i) ) + QRMath.glog(e.get(j) ) );
+}
+}
+return new QRPolynomial(num, 0);
+},
+mod : function(e) {
+if (this.getLength() - e.getLength() < 0) {
+return this;
+}
+var ratio = QRMath.glog(this.get(0) ) - QRMath.glog(e.get(0) );
+var num = new Array(this.getLength() );
+for (var i = 0; i < this.getLength(); i++) {
+num[i] = this.get(i);
+}
+for (var x = 0; x < e.getLength(); x++) {
+num[x] ^= QRMath.gexp(QRMath.glog(e.get(x) ) + ratio);
+}
+// recursive call
+return new QRPolynomial(num, 0).mod(e);
+}
+};
+module.exports = QRPolynomial;
+};
+M['./QRRSBlock']=function(module,exports,require){var QRErrorCorrectLevel = require('./QRErrorCorrectLevel');
+function QRRSBlock(totalCount, dataCount) {
+this.totalCount = totalCount;
+this.dataCount  = dataCount;
+}
+QRRSBlock.RS_BLOCK_TABLE = [
+// L
+// M
+// Q
+// H
+// 1
+[1, 26, 19],
+[1, 26, 16],
+[1, 26, 13],
+[1, 26, 9],
+// 2
+[1, 44, 34],
+[1, 44, 28],
+[1, 44, 22],
+[1, 44, 16],
+// 3
+[1, 70, 55],
+[1, 70, 44],
+[2, 35, 17],
+[2, 35, 13],
+// 4
+[1, 100, 80],
+[2, 50, 32],
+[2, 50, 24],
+[4, 25, 9],
+// 5
+[1, 134, 108],
+[2, 67, 43],
+[2, 33, 15, 2, 34, 16],
+[2, 33, 11, 2, 34, 12],
+// 6
+[2, 86, 68],
+[4, 43, 27],
+[4, 43, 19],
+[4, 43, 15],
+// 7
+[2, 98, 78],
+[4, 49, 31],
+[2, 32, 14, 4, 33, 15],
+[4, 39, 13, 1, 40, 14],
+// 8
+[2, 121, 97],
+[2, 60, 38, 2, 61, 39],
+[4, 40, 18, 2, 41, 19],
+[4, 40, 14, 2, 41, 15],
+// 9
+[2, 146, 116],
+[3, 58, 36, 2, 59, 37],
+[4, 36, 16, 4, 37, 17],
+[4, 36, 12, 4, 37, 13],
+// 10
+[2, 86, 68, 2, 87, 69],
+[4, 69, 43, 1, 70, 44],
+[6, 43, 19, 2, 44, 20],
+[6, 43, 15, 2, 44, 16],
+// 11
+[4, 101, 81],
+[1, 80, 50, 4, 81, 51],
+[4, 50, 22, 4, 51, 23],
+[3, 36, 12, 8, 37, 13],
+// 12
+[2, 116, 92, 2, 117, 93],
+[6, 58, 36, 2, 59, 37],
+[4, 46, 20, 6, 47, 21],
+[7, 42, 14, 4, 43, 15],
+// 13
+[4, 133, 107],
+[8, 59, 37, 1, 60, 38],
+[8, 44, 20, 4, 45, 21],
+[12, 33, 11, 4, 34, 12],
+// 14
+[3, 145, 115, 1, 146, 116],
+[4, 64, 40, 5, 65, 41],
+[11, 36, 16, 5, 37, 17],
+[11, 36, 12, 5, 37, 13],
+// 15
+[5, 109, 87, 1, 110, 88],
+[5, 65, 41, 5, 66, 42],
+[5, 54, 24, 7, 55, 25],
+[11, 36, 12],
+// 16
+[5, 122, 98, 1, 123, 99],
+[7, 73, 45, 3, 74, 46],
+[15, 43, 19, 2, 44, 20],
+[3, 45, 15, 13, 46, 16],
+// 17
+[1, 135, 107, 5, 136, 108],
+[10, 74, 46, 1, 75, 47],
+[1, 50, 22, 15, 51, 23],
+[2, 42, 14, 17, 43, 15],
+// 18
+[5, 150, 120, 1, 151, 121],
+[9, 69, 43, 4, 70, 44],
+[17, 50, 22, 1, 51, 23],
+[2, 42, 14, 19, 43, 15],
+// 19
+[3, 141, 113, 4, 142, 114],
+[3, 70, 44, 11, 71, 45],
+[17, 47, 21, 4, 48, 22],
+[9, 39, 13, 16, 40, 14],
+// 20
+[3, 135, 107, 5, 136, 108],
+[3, 67, 41, 13, 68, 42],
+[15, 54, 24, 5, 55, 25],
+[15, 43, 15, 10, 44, 16],
+// 21
+[4, 144, 116, 4, 145, 117],
+[17, 68, 42],
+[17, 50, 22, 6, 51, 23],
+[19, 46, 16, 6, 47, 17],
+// 22
+[2, 139, 111, 7, 140, 112],
+[17, 74, 46],
+[7, 54, 24, 16, 55, 25],
+[34, 37, 13],
+// 23
+[4, 151, 121, 5, 152, 122],
+[4, 75, 47, 14, 76, 48],
+[11, 54, 24, 14, 55, 25],
+[16, 45, 15, 14, 46, 16],
+// 24
+[6, 147, 117, 4, 148, 118],
+[6, 73, 45, 14, 74, 46],
+[11, 54, 24, 16, 55, 25],
+[30, 46, 16, 2, 47, 17],
+// 25
+[8, 132, 106, 4, 133, 107],
+[8, 75, 47, 13, 76, 48],
+[7, 54, 24, 22, 55, 25],
+[22, 45, 15, 13, 46, 16],
+// 26
+[10, 142, 114, 2, 143, 115],
+[19, 74, 46, 4, 75, 47],
+[28, 50, 22, 6, 51, 23],
+[33, 46, 16, 4, 47, 17],
+// 27
+[8, 152, 122, 4, 153, 123],
+[22, 73, 45, 3, 74, 46],
+[8, 53, 23, 26, 54, 24],
+[12, 45, 15, 28, 46, 16],
+// 28
+[3, 147, 117, 10, 148, 118],
+[3, 73, 45, 23, 74, 46],
+[4, 54, 24, 31, 55, 25],
+[11, 45, 15, 31, 46, 16],
+// 29
+[7, 146, 116, 7, 147, 117],
+[21, 73, 45, 7, 74, 46],
+[1, 53, 23, 37, 54, 24],
+[19, 45, 15, 26, 46, 16],
+// 30
+[5, 145, 115, 10, 146, 116],
+[19, 75, 47, 10, 76, 48],
+[15, 54, 24, 25, 55, 25],
+[23, 45, 15, 25, 46, 16],
+// 31
+[13, 145, 115, 3, 146, 116],
+[2, 74, 46, 29, 75, 47],
+[42, 54, 24, 1, 55, 25],
+[23, 45, 15, 28, 46, 16],
+// 32
+[17, 145, 115],
+[10, 74, 46, 23, 75, 47],
+[10, 54, 24, 35, 55, 25],
+[19, 45, 15, 35, 46, 16],
+// 33
+[17, 145, 115, 1, 146, 116],
+[14, 74, 46, 21, 75, 47],
+[29, 54, 24, 19, 55, 25],
+[11, 45, 15, 46, 46, 16],
+// 34
+[13, 145, 115, 6, 146, 116],
+[14, 74, 46, 23, 75, 47],
+[44, 54, 24, 7, 55, 25],
+[59, 46, 16, 1, 47, 17],
+// 35
+[12, 151, 121, 7, 152, 122],
+[12, 75, 47, 26, 76, 48],
+[39, 54, 24, 14, 55, 25],
+[22, 45, 15, 41, 46, 16],
+// 36
+[6, 151, 121, 14, 152, 122],
+[6, 75, 47, 34, 76, 48],
+[46, 54, 24, 10, 55, 25],
+[2, 45, 15, 64, 46, 16],
+// 37
+[17, 152, 122, 4, 153, 123],
+[29, 74, 46, 14, 75, 47],
+[49, 54, 24, 10, 55, 25],
+[24, 45, 15, 46, 46, 16],
+// 38
+[4, 152, 122, 18, 153, 123],
+[13, 74, 46, 32, 75, 47],
+[48, 54, 24, 14, 55, 25],
+[42, 45, 15, 32, 46, 16],
+// 39
+[20, 147, 117, 4, 148, 118],
+[40, 75, 47, 7, 76, 48],
+[43, 54, 24, 22, 55, 25],
+[10, 45, 15, 67, 46, 16],
+// 40
+[19, 148, 118, 6, 149, 119],
+[18, 75, 47, 31, 76, 48],
+[34, 54, 24, 34, 55, 25],
+[20, 45, 15, 61, 46, 16]
+];
+QRRSBlock.getRSBlocks = function(typeNumber, errorCorrectLevel) {
+var rsBlock = QRRSBlock.getRsBlockTable(typeNumber, errorCorrectLevel);
+if (rsBlock === undefined) {
+throw new Error("bad rs block @ typeNumber:" + typeNumber + "/errorCorrectLevel:" + errorCorrectLevel);
+}
+var length = rsBlock.length / 3;
+var list = [];
+for (var i = 0; i < length; i++) {
+var count = rsBlock[i * 3 + 0];
+var totalCount = rsBlock[i * 3 + 1];
+var dataCount  = rsBlock[i * 3 + 2];
+for (var j = 0; j < count; j++) {
+list.push(new QRRSBlock(totalCount, dataCount) );
+}
+}
+return list;
+};
+QRRSBlock.getRsBlockTable = function(typeNumber, errorCorrectLevel) {
+switch(errorCorrectLevel) {
+case QRErrorCorrectLevel.L :
+return QRRSBlock.RS_BLOCK_TABLE[(typeNumber - 1) * 4 + 0];
+case QRErrorCorrectLevel.M :
+return QRRSBlock.RS_BLOCK_TABLE[(typeNumber - 1) * 4 + 1];
+case QRErrorCorrectLevel.Q :
+return QRRSBlock.RS_BLOCK_TABLE[(typeNumber - 1) * 4 + 2];
+case QRErrorCorrectLevel.H :
+return QRRSBlock.RS_BLOCK_TABLE[(typeNumber - 1) * 4 + 3];
+default :
+return undefined;
+}
+};
+module.exports = QRRSBlock;
+};
+M['./QRUtil']=function(module,exports,require){var QRMode = require('./QRMode');
+var QRPolynomial = require('./QRPolynomial');
+var QRMath = require('./QRMath');
+var QRMaskPattern = require('./QRMaskPattern');
+var QRUtil = {
+PATTERN_POSITION_TABLE : [
+[],
+[6, 18],
+[6, 22],
+[6, 26],
+[6, 30],
+[6, 34],
+[6, 22, 38],
+[6, 24, 42],
+[6, 26, 46],
+[6, 28, 50],
+[6, 30, 54],
+[6, 32, 58],
+[6, 34, 62],
+[6, 26, 46, 66],
+[6, 26, 48, 70],
+[6, 26, 50, 74],
+[6, 30, 54, 78],
+[6, 30, 56, 82],
+[6, 30, 58, 86],
+[6, 34, 62, 90],
+[6, 28, 50, 72, 94],
+[6, 26, 50, 74, 98],
+[6, 30, 54, 78, 102],
+[6, 28, 54, 80, 106],
+[6, 32, 58, 84, 110],
+[6, 30, 58, 86, 114],
+[6, 34, 62, 90, 118],
+[6, 26, 50, 74, 98, 122],
+[6, 30, 54, 78, 102, 126],
+[6, 26, 52, 78, 104, 130],
+[6, 30, 56, 82, 108, 134],
+[6, 34, 60, 86, 112, 138],
+[6, 30, 58, 86, 114, 142],
+[6, 34, 62, 90, 118, 146],
+[6, 30, 54, 78, 102, 126, 150],
+[6, 24, 50, 76, 102, 128, 154],
+[6, 28, 54, 80, 106, 132, 158],
+[6, 32, 58, 84, 110, 136, 162],
+[6, 26, 54, 82, 110, 138, 166],
+[6, 30, 58, 86, 114, 142, 170]
+],
+G15 : (1 << 10) | (1 << 8) | (1 << 5) | (1 << 4) | (1 << 2) | (1 << 1) | (1 << 0),
+G18 : (1 << 12) | (1 << 11) | (1 << 10) | (1 << 9) | (1 << 8) | (1 << 5) | (1 << 2) | (1 << 0),
+G15_MASK : (1 << 14) | (1 << 12) | (1 << 10)    | (1 << 4) | (1 << 1),
+getBCHTypeInfo : function(data) {
+var d = data << 10;
+while (QRUtil.getBCHDigit(d) - QRUtil.getBCHDigit(QRUtil.G15) >= 0) {
+d ^= (QRUtil.G15 << (QRUtil.getBCHDigit(d) - QRUtil.getBCHDigit(QRUtil.G15) ) );
+}
+return ( (data << 10) | d) ^ QRUtil.G15_MASK;
+},
+getBCHTypeNumber : function(data) {
+var d = data << 12;
+while (QRUtil.getBCHDigit(d) - QRUtil.getBCHDigit(QRUtil.G18) >= 0) {
+d ^= (QRUtil.G18 << (QRUtil.getBCHDigit(d) - QRUtil.getBCHDigit(QRUtil.G18) ) );
+}
+return (data << 12) | d;
+},
+getBCHDigit : function(data) {
+var digit = 0;
+while (data !== 0) {
+digit++;
+data >>>= 1;
+}
+return digit;
+},
+getPatternPosition : function(typeNumber) {
+return QRUtil.PATTERN_POSITION_TABLE[typeNumber - 1];
+},
+getMask : function(maskPattern, i, j) {
+switch (maskPattern) {
+case QRMaskPattern.PATTERN000 : return (i + j) % 2 === 0;
+case QRMaskPattern.PATTERN001 : return i % 2 === 0;
+case QRMaskPattern.PATTERN010 : return j % 3 === 0;
+case QRMaskPattern.PATTERN011 : return (i + j) % 3 === 0;
+case QRMaskPattern.PATTERN100 : return (Math.floor(i / 2) + Math.floor(j / 3) ) % 2 === 0;
+case QRMaskPattern.PATTERN101 : return (i * j) % 2 + (i * j) % 3 === 0;
+case QRMaskPattern.PATTERN110 : return ( (i * j) % 2 + (i * j) % 3) % 2 === 0;
+case QRMaskPattern.PATTERN111 : return ( (i * j) % 3 + (i + j) % 2) % 2 === 0;
+default :
+throw new Error("bad maskPattern:" + maskPattern);
+}
+},
+getErrorCorrectPolynomial : function(errorCorrectLength) {
+var a = new QRPolynomial([1], 0);
+for (var i = 0; i < errorCorrectLength; i++) {
+a = a.multiply(new QRPolynomial([1, QRMath.gexp(i)], 0) );
+}
+return a;
+},
+getLengthInBits : function(mode, type) {
+if (1 <= type && type < 10) {
+// 1 - 9
+switch(mode) {
+case QRMode.MODE_NUMBER     : return 10;
+case QRMode.MODE_ALPHA_NUM  : return 9;
+case QRMode.MODE_8BIT_BYTE  : return 8;
+case QRMode.MODE_KANJI      : return 8;
+default :
+throw new Error("mode:" + mode);
+}
+} else if (type < 27) {
+// 10 - 26
+switch(mode) {
+case QRMode.MODE_NUMBER     : return 12;
+case QRMode.MODE_ALPHA_NUM  : return 11;
+case QRMode.MODE_8BIT_BYTE  : return 16;
+case QRMode.MODE_KANJI      : return 10;
+default :
+throw new Error("mode:" + mode);
+}
+} else if (type < 41) {
+// 27 - 40
+switch(mode) {
+case QRMode.MODE_NUMBER     : return 14;
+case QRMode.MODE_ALPHA_NUM  : return 13;
+case QRMode.MODE_8BIT_BYTE  : return 16;
+case QRMode.MODE_KANJI      : return 12;
+default :
+throw new Error("mode:" + mode);
+}
+} else {
+throw new Error("type:" + type);
+}
+},
+getLostPoint : function(qrCode) {
+var moduleCount = qrCode.getModuleCount();
+var lostPoint = 0;
+var row = 0;
+var col = 0;
+// LEVEL1
+for (row = 0; row < moduleCount; row++) {
+for (col = 0; col < moduleCount; col++) {
+var sameCount = 0;
+var dark = qrCode.isDark(row, col);
+for (var r = -1; r <= 1; r++) {
+if (row + r < 0 || moduleCount <= row + r) {
+continue;
+}
+for (var c = -1; c <= 1; c++) {
+if (col + c < 0 || moduleCount <= col + c) {
+continue;
+}
+if (r === 0 && c === 0) {
+continue;
+}
+if (dark === qrCode.isDark(row + r, col + c) ) {
+sameCount++;
+}
+}
+}
+if (sameCount > 5) {
+lostPoint += (3 + sameCount - 5);
+}
+}
+}
+// LEVEL2
+for (row = 0; row < moduleCount - 1; row++) {
+for (col = 0; col < moduleCount - 1; col++) {
+var count = 0;
+if (qrCode.isDark(row,     col    ) ) count++;
+if (qrCode.isDark(row + 1, col    ) ) count++;
+if (qrCode.isDark(row,     col + 1) ) count++;
+if (qrCode.isDark(row + 1, col + 1) ) count++;
+if (count === 0 || count === 4) {
+lostPoint += 3;
+}
+}
+}
+// LEVEL3
+for (row = 0; row < moduleCount; row++) {
+for (col = 0; col < moduleCount - 6; col++) {
+if (qrCode.isDark(row, col) &&
+!qrCode.isDark(row, col + 1) &&
+qrCode.isDark(row, col + 2) &&
+qrCode.isDark(row, col + 3) &&
+qrCode.isDark(row, col + 4) &&
+!qrCode.isDark(row, col + 5) &&
+qrCode.isDark(row, col + 6) ) {
+lostPoint += 40;
+}
+}
+}
+for (col = 0; col < moduleCount; col++) {
+for (row = 0; row < moduleCount - 6; row++) {
+if (qrCode.isDark(row, col) &&
+!qrCode.isDark(row + 1, col) &&
+qrCode.isDark(row + 2, col) &&
+qrCode.isDark(row + 3, col) &&
+qrCode.isDark(row + 4, col) &&
+!qrCode.isDark(row + 5, col) &&
+qrCode.isDark(row + 6, col) ) {
+lostPoint += 40;
+}
+}
+}
+// LEVEL4
+var darkCount = 0;
+for (col = 0; col < moduleCount; col++) {
+for (row = 0; row < moduleCount; row++) {
+if (qrCode.isDark(row, col) ) {
+darkCount++;
+}
+}
+}
+var ratio = Math.abs(100 * darkCount / moduleCount / moduleCount - 50) / 5;
+lostPoint += ratio * 10;
+return lostPoint;
+}
+};
+module.exports = QRUtil;
+};
+M['./index']=function(module,exports,require){//---------------------------------------------------------------------
+// QRCode for JavaScript
+//
+// Copyright (c) 2009 Kazuhiko Arase
+//
+// URL: http://www.d-project.com/
+//
+// Licensed under the MIT license:
+//   http://www.opensource.org/licenses/mit-license.php
+//
+// The word "QR Code" is registered trademark of
+// DENSO WAVE INCORPORATED
+//   http://www.denso-wave.com/qrcode/faqpatent-e.html
+//
+//---------------------------------------------------------------------
+// Modified to work in node for this project (and some refactoring)
+//---------------------------------------------------------------------
+var QR8bitByte = require('./QR8bitByte');
+var QRUtil = require('./QRUtil');
+var QRPolynomial = require('./QRPolynomial');
+var QRRSBlock = require('./QRRSBlock');
+var QRBitBuffer = require('./QRBitBuffer');
+function QRCode(typeNumber, errorCorrectLevel) {
+this.typeNumber = typeNumber;
+this.errorCorrectLevel = errorCorrectLevel;
+this.modules = null;
+this.moduleCount = 0;
+this.dataCache = null;
+this.dataList = [];
+}
+QRCode.prototype = {
+addData : function(data) {
+var newData = new QR8bitByte(data);
+this.dataList.push(newData);
+this.dataCache = null;
+},
+isDark : function(row, col) {
+if (row < 0 || this.moduleCount <= row || col < 0 || this.moduleCount <= col) {
+throw new Error(row + "," + col);
+}
+return this.modules[row][col];
+},
+getModuleCount : function() {
+return this.moduleCount;
+},
+make : function() {
+// Calculate automatically typeNumber if provided is < 1
+if (this.typeNumber < 1 ){
+var typeNumber = 1;
+for (typeNumber = 1; typeNumber < 40; typeNumber++) {
+var rsBlocks = QRRSBlock.getRSBlocks(typeNumber, this.errorCorrectLevel);
+var buffer = new QRBitBuffer();
+var totalDataCount = 0;
+for (var i = 0; i < rsBlocks.length; i++) {
+totalDataCount += rsBlocks[i].dataCount;
+}
+for (var x = 0; x < this.dataList.length; x++) {
+var data = this.dataList[x];
+buffer.put(data.mode, 4);
+buffer.put(data.getLength(), QRUtil.getLengthInBits(data.mode, typeNumber) );
+data.write(buffer);
+}
+if (buffer.getLengthInBits() <= totalDataCount * 8)
+break;
+}
+this.typeNumber = typeNumber;
+}
+this.makeImpl(false, this.getBestMaskPattern() );
+},
+makeImpl : function(test, maskPattern) {
+this.moduleCount = this.typeNumber * 4 + 17;
+this.modules = new Array(this.moduleCount);
+for (var row = 0; row < this.moduleCount; row++) {
+this.modules[row] = new Array(this.moduleCount);
+for (var col = 0; col < this.moduleCount; col++) {
+this.modules[row][col] = null;//(col + row) % 3;
+}
+}
+this.setupPositionProbePattern(0, 0);
+this.setupPositionProbePattern(this.moduleCount - 7, 0);
+this.setupPositionProbePattern(0, this.moduleCount - 7);
+this.setupPositionAdjustPattern();
+this.setupTimingPattern();
+this.setupTypeInfo(test, maskPattern);
+if (this.typeNumber >= 7) {
+this.setupTypeNumber(test);
+}
+if (this.dataCache === null) {
+this.dataCache = QRCode.createData(this.typeNumber, this.errorCorrectLevel, this.dataList);
+}
+this.mapData(this.dataCache, maskPattern);
+},
+setupPositionProbePattern : function(row, col)  {
+for (var r = -1; r <= 7; r++) {
+if (row + r <= -1 || this.moduleCount <= row + r) continue;
+for (var c = -1; c <= 7; c++) {
+if (col + c <= -1 || this.moduleCount <= col + c) continue;
+if ( (0 <= r && r <= 6 && (c === 0 || c === 6) ) ||
+(0 <= c && c <= 6 && (r === 0 || r === 6) ) ||
+(2 <= r && r <= 4 && 2 <= c && c <= 4) ) {
+this.modules[row + r][col + c] = true;
+} else {
+this.modules[row + r][col + c] = false;
+}
+}
+}
+},
+getBestMaskPattern : function() {
+var minLostPoint = 0;
+var pattern = 0;
+for (var i = 0; i < 8; i++) {
+this.makeImpl(true, i);
+var lostPoint = QRUtil.getLostPoint(this);
+if (i === 0 || minLostPoint >  lostPoint) {
+minLostPoint = lostPoint;
+pattern = i;
+}
+}
+return pattern;
+},
+createMovieClip : function(target_mc, instance_name, depth) {
+var qr_mc = target_mc.createEmptyMovieClip(instance_name, depth);
+var cs = 1;
+this.make();
+for (var row = 0; row < this.modules.length; row++) {
+var y = row * cs;
+for (var col = 0; col < this.modules[row].length; col++) {
+var x = col * cs;
+var dark = this.modules[row][col];
+if (dark) {
+qr_mc.beginFill(0, 100);
+qr_mc.moveTo(x, y);
+qr_mc.lineTo(x + cs, y);
+qr_mc.lineTo(x + cs, y + cs);
+qr_mc.lineTo(x, y + cs);
+qr_mc.endFill();
+}
+}
+}
+return qr_mc;
+},
+setupTimingPattern : function() {
+for (var r = 8; r < this.moduleCount - 8; r++) {
+if (this.modules[r][6] !== null) {
+continue;
+}
+this.modules[r][6] = (r % 2 === 0);
+}
+for (var c = 8; c < this.moduleCount - 8; c++) {
+if (this.modules[6][c] !== null) {
+continue;
+}
+this.modules[6][c] = (c % 2 === 0);
+}
+},
+setupPositionAdjustPattern : function() {
+var pos = QRUtil.getPatternPosition(this.typeNumber);
+for (var i = 0; i < pos.length; i++) {
+for (var j = 0; j < pos.length; j++) {
+var row = pos[i];
+var col = pos[j];
+if (this.modules[row][col] !== null) {
+continue;
+}
+for (var r = -2; r <= 2; r++) {
+for (var c = -2; c <= 2; c++) {
+if (Math.abs(r) === 2 ||
+Math.abs(c) === 2 ||
+(r === 0 && c === 0) ) {
+this.modules[row + r][col + c] = true;
+} else {
+this.modules[row + r][col + c] = false;
+}
+}
+}
+}
+}
+},
+setupTypeNumber : function(test) {
+var bits = QRUtil.getBCHTypeNumber(this.typeNumber);
+var mod;
+for (var i = 0; i < 18; i++) {
+mod = (!test && ( (bits >> i) & 1) === 1);
+this.modules[Math.floor(i / 3)][i % 3 + this.moduleCount - 8 - 3] = mod;
+}
+for (var x = 0; x < 18; x++) {
+mod = (!test && ( (bits >> x) & 1) === 1);
+this.modules[x % 3 + this.moduleCount - 8 - 3][Math.floor(x / 3)] = mod;
+}
+},
+setupTypeInfo : function(test, maskPattern) {
+var data = (this.errorCorrectLevel << 3) | maskPattern;
+var bits = QRUtil.getBCHTypeInfo(data);
+var mod;
+// vertical
+for (var v = 0; v < 15; v++) {
+mod = (!test && ( (bits >> v) & 1) === 1);
+if (v < 6) {
+this.modules[v][8] = mod;
+} else if (v < 8) {
+this.modules[v + 1][8] = mod;
+} else {
+this.modules[this.moduleCount - 15 + v][8] = mod;
+}
+}
+// horizontal
+for (var h = 0; h < 15; h++) {
+mod = (!test && ( (bits >> h) & 1) === 1);
+if (h < 8) {
+this.modules[8][this.moduleCount - h - 1] = mod;
+} else if (h < 9) {
+this.modules[8][15 - h - 1 + 1] = mod;
+} else {
+this.modules[8][15 - h - 1] = mod;
+}
+}
+// fixed module
+this.modules[this.moduleCount - 8][8] = (!test);
+},
+mapData : function(data, maskPattern) {
+var inc = -1;
+var row = this.moduleCount - 1;
+var bitIndex = 7;
+var byteIndex = 0;
+for (var col = this.moduleCount - 1; col > 0; col -= 2) {
+if (col === 6) col--;
+while (true) {
+for (var c = 0; c < 2; c++) {
+if (this.modules[row][col - c] === null) {
+var dark = false;
+if (byteIndex < data.length) {
+dark = ( ( (data[byteIndex] >>> bitIndex) & 1) === 1);
+}
+var mask = QRUtil.getMask(maskPattern, row, col - c);
+if (mask) {
+dark = !dark;
+}
+this.modules[row][col - c] = dark;
+bitIndex--;
+if (bitIndex === -1) {
+byteIndex++;
+bitIndex = 7;
+}
+}
+}
+row += inc;
+if (row < 0 || this.moduleCount <= row) {
+row -= inc;
+inc = -inc;
+break;
+}
+}
+}
+}
+};
+QRCode.PAD0 = 0xEC;
+QRCode.PAD1 = 0x11;
+QRCode.createData = function(typeNumber, errorCorrectLevel, dataList) {
+var rsBlocks = QRRSBlock.getRSBlocks(typeNumber, errorCorrectLevel);
+var buffer = new QRBitBuffer();
+for (var i = 0; i < dataList.length; i++) {
+var data = dataList[i];
+buffer.put(data.mode, 4);
+buffer.put(data.getLength(), QRUtil.getLengthInBits(data.mode, typeNumber) );
+data.write(buffer);
+}
+// calc num max data.
+var totalDataCount = 0;
+for (var x = 0; x < rsBlocks.length; x++) {
+totalDataCount += rsBlocks[x].dataCount;
+}
+if (buffer.getLengthInBits() > totalDataCount * 8) {
+throw new Error("code length overflow. (" +
+buffer.getLengthInBits() +
+">" +
+totalDataCount * 8 +
+")");
+}
+// end code
+if (buffer.getLengthInBits() + 4 <= totalDataCount * 8) {
+buffer.put(0, 4);
+}
+// padding
+while (buffer.getLengthInBits() % 8 !== 0) {
+buffer.putBit(false);
+}
+// padding
+while (true) {
+if (buffer.getLengthInBits() >= totalDataCount * 8) {
+break;
+}
+buffer.put(QRCode.PAD0, 8);
+if (buffer.getLengthInBits() >= totalDataCount * 8) {
+break;
+}
+buffer.put(QRCode.PAD1, 8);
+}
+return QRCode.createBytes(buffer, rsBlocks);
+};
+QRCode.createBytes = function(buffer, rsBlocks) {
+var offset = 0;
+var maxDcCount = 0;
+var maxEcCount = 0;
+var dcdata = new Array(rsBlocks.length);
+var ecdata = new Array(rsBlocks.length);
+for (var r = 0; r < rsBlocks.length; r++) {
+var dcCount = rsBlocks[r].dataCount;
+var ecCount = rsBlocks[r].totalCount - dcCount;
+maxDcCount = Math.max(maxDcCount, dcCount);
+maxEcCount = Math.max(maxEcCount, ecCount);
+dcdata[r] = new Array(dcCount);
+for (var i = 0; i < dcdata[r].length; i++) {
+dcdata[r][i] = 0xff & buffer.buffer[i + offset];
+}
+offset += dcCount;
+var rsPoly = QRUtil.getErrorCorrectPolynomial(ecCount);
+var rawPoly = new QRPolynomial(dcdata[r], rsPoly.getLength() - 1);
+var modPoly = rawPoly.mod(rsPoly);
+ecdata[r] = new Array(rsPoly.getLength() - 1);
+for (var x = 0; x < ecdata[r].length; x++) {
+var modIndex = x + modPoly.getLength() - ecdata[r].length;
+ecdata[r][x] = (modIndex >= 0)? modPoly.get(modIndex) : 0;
+}
+}
+var totalCodeCount = 0;
+for (var y = 0; y < rsBlocks.length; y++) {
+totalCodeCount += rsBlocks[y].totalCount;
+}
+var data = new Array(totalCodeCount);
+var index = 0;
+for (var z = 0; z < maxDcCount; z++) {
+for (var s = 0; s < rsBlocks.length; s++) {
+if (z < dcdata[s].length) {
+data[index++] = dcdata[s][z];
+}
+}
+}
+for (var xx = 0; xx < maxEcCount; xx++) {
+for (var t = 0; t < rsBlocks.length; t++) {
+if (xx < ecdata[t].length) {
+data[index++] = ecdata[t][xx];
+}
+}
+}
+return data;
+};
+module.exports = QRCode;
+};
+return req('./index')})();
+/* ===== Einladen per Link und QR-Code ===== */
+const APP_URL='https://k4tbtt62r5-max.github.io/PADELUP/app/';
+function joinUrl(c){return APP_URL+'#join='+encodeURIComponent(c)}
+function qrSvg(t,sz){const q=new QRLIB(-1,0);q.addData(t);q.make();const n=q.getModuleCount(),b=4,N=n+2*b;let d='';for(let r=0;r<n;r++)for(let c=0;c<n;c++)if(q.isDark(r,c))d+='M'+(c+b)+' '+(r+b)+'h1v1h-1z';
+ return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${N} ${N}" width="${sz}" height="${sz}" shape-rendering="crispEdges" role="img" aria-label="QR-Code"><rect width="${N}" height="${N}" fill="#fff"/><path d="${d}" fill="#000"/></svg>`}
+function joinGet(){let c=null;try{const m=(location.hash||'').match(/join=([A-Za-z0-9]{4,12})/)||(location.search||'').match(/[?&]join=([A-Za-z0-9]{4,12})/);
+ if(m){c=m[1].toUpperCase();lsSet('padel_join',c);try{history.replaceState(null,'',location.pathname)}catch(e){}}}catch(e){}return c||lsGet('padel_join',null)}
+function joinClear(){try{localStorage.removeItem('padel_join')}catch(e){}}
+let JN=false;
+async function joinPending(){const c=lsGet('padel_join',null);if(!c||JN||!isR()||!RM.ready||RM.err)return;
+ const h=S.halls.find(x=>!x.none&&String(x.code||'').toUpperCase()==c);
+ if(h){joinClear();if(h.id!=S.hall)rSetHall(h.id);toast('Du bist schon Mitglied in '+h.name);return}
+ if(!RM.profile||myLevel()==null)return;
+ JN=true;try{const id=await rpc('join_hall',{p_code:c,p_level:myLevel()});joinClear();RM.hall=id;lsSet('padel_rhall',id);RM.ready=false;await remoteLoad();view='rank';render();toast('Willkommen in deiner Halle!')}
+ catch(e){joinClear();msg('Der Einladungs-Link hat nicht geklappt'+(e&&e.message?': '+e.message:'.')+' Du kannst den Hallencode auch unter „Halle wechseln“ eingeben.')}finally{JN=false}}
+function joinHint(){const c=lsGet('padel_join',null);return c?`<div class='card' style='background:var(--limetint);border-color:var(--lime)'><b>🎟️ Du wurdest eingeladen</b><div class='sub' style='font-size:14px;color:var(--tx);margin-top:4px;line-height:1.5'>Hallencode <b>${esc(c)}</b>. ${!A.session?'Erstelle ein Konto oder melde dich an. Danach trittst du der Halle automatisch bei.':'Lege dein Profil mit deinem Level an. Danach trittst du der Halle automatisch bei.'}</div></div>`:''}
+function invH(){const h=curHall();return h&&!h.none&&h.code?h:null}
+function invText(kind,m){const h=invH();if(!h)return '';const u=joinUrl(h.code);
+ if(kind=='opp')return `Hey! Lass uns unser Padel-Match in PADELUP eintragen 🎾 Tritt der Rangliste von ${h.name} bei: ${u} (Hallencode ${h.code}). Danach kann ich dich als Gegner auswählen.`;
+ if(kind=='remind')return `Hey! Ich habe unser Padel-Ergebnis${m&&m.sc?' ('+m.sc+')':''} in PADELUP eingetragen. Bitte bestätige es kurz in der App: ${APP_URL}`;
+ return `Komm in unsere Padel-Rangliste bei ${h.name}! 🎾 Rookie, Smash und Elite, neue Saison alle 4 Wochen. App öffnen und beitreten: ${u} (Hallencode ${h.code})`}
+function shareSheet(t,title){if(!t){msg('Dafür musst du zuerst einer Halle beitreten.');return}window._sht=t;
+ sheet(`<h3>${esc(title||'Einladen')}</h3><div class='sub' style='font-size:14px;color:var(--tx);background:var(--soft);border-radius:12px;padding:10px 12px;margin-bottom:10px;line-height:1.5;white-space:pre-wrap'>${esc(t)}</div><a class='btn' style='display:block;text-align:center;text-decoration:none;background:#25d366;color:#fff' href='https://wa.me/?text=${encodeURIComponent(t)}' target='_blank' rel='noopener'>Per WhatsApp senden</a>${(navigator.share||(window.Capacitor&&Capacitor.Plugins&&Capacitor.Plugins.Share))?`<button class='btn ghost' onclick='shareOther()'>Andere App …</button>`:''}<button class='btn ghost' onclick='shareCopy()'>Text kopieren</button><button class='btn ghost' onclick='closeM()'>Schließen</button>`)}
+async function shareOther(){const t=window._sht;try{if(navigator.share){await navigator.share({text:t});return}const SH=window.Capacitor&&Capacitor.Plugins&&Capacitor.Plugins.Share;if(SH)await SH.share({text:t})}catch(e){}}
+function shareCopy(){try{navigator.clipboard.writeText(window._sht).then(()=>toast('Text kopiert'),()=>msg('Kopieren hat nicht geklappt. Halte den Text gedrückt, um ihn zu markieren.'))}catch(e){msg('Kopieren hat nicht geklappt.')}}
+function inviteOpp(){closeM();shareSheet(invText('opp'),'Gegner einladen')}
+function remindOpp(id){const m=S.matches.find(x=>x.id==id);shareSheet(invText('remind',m),'An Bestätigung erinnern')}
+function qrShow(){const h=invH();if(!h)return;sheet(`<div class='center'><h3>${esc(h.name)}</h3><div class='sub' style='margin-bottom:10px'>Mit der Handykamera scannen</div><div class='qrbox'>${qrSvg(joinUrl(h.code),260)}</div><div style='font-size:24px;font-weight:800;letter-spacing:3px;margin:10px 0 2px'>${esc(h.code)}</div><div class='sub'>Hallencode</div></div><button class='btn' onclick='posterMake()'>Aushang erstellen</button><button class='btn ghost' onclick='closeM()'>Schließen</button>`)}
+function posterCanvas(h){const W=1240,H=1754,c=document.createElement('canvas');c.width=W;c.height=H;const x=c.getContext('2d');
+ const rr=(X,Y,w,hh,r)=>{x.beginPath();if(x.roundRect)x.roundRect(X,Y,w,hh,r);else x.rect(X,Y,w,hh)};
+ x.fillStyle='#ffffff';x.fillRect(0,0,W,H);x.fillStyle='#0e1b3d';x.fillRect(0,0,W,330);
+ x.fillStyle='#c8f31d';x.font='900 120px system-ui,-apple-system,Segoe UI,Arial';x.textAlign='center';x.fillText('PADELUP',W/2,175);
+ x.fillStyle='#ffffff';x.font='700 44px system-ui,-apple-system,Segoe UI,Arial';x.fillText('Die Rangliste dieser Halle',W/2,260);
+ x.fillStyle='#0e1b3d';let fs=76;x.font='900 '+fs+'px system-ui,-apple-system,Segoe UI,Arial';while(x.measureText(h.name).width>W-140&&fs>40){fs-=4;x.font='900 '+fs+'px system-ui,-apple-system,Segoe UI,Arial'}x.fillText(h.name,W/2,450);
+ const q=new QRLIB(-1,0);q.addData(joinUrl(h.code));q.make();const n=q.getModuleCount(),S0=640,m=Math.floor(S0/(n+8)),qs=m*(n+8),qx=(W-qs)/2,qy=510;
+ x.fillStyle='#c8f31d';rr(qx-24,qy-24,qs+48,qs+48,36);x.fill();x.fillStyle='#ffffff';rr(qx,qy,qs,qs,18);x.fill();x.fillStyle='#000000';
+ for(let r=0;r<n;r++)for(let k=0;k<n;k++)if(q.isDark(r,k))x.fillRect(qx+(k+4)*m,qy+(r+4)*m,m,m);
+ let y=qy+qs+100;x.fillStyle='#6c7a96';x.font='700 38px system-ui,-apple-system,Segoe UI,Arial';x.fillText('Hallencode',W/2,y);
+ x.fillStyle='#0e1b3d';x.font='900 84px ui-monospace,Menlo,Consolas,monospace';x.fillText(h.code,W/2,y+92);
+ y+=200;const st=[['1','QR-Code mit der Handykamera scannen'],['2','Konto erstellen und Playtomic-Level eintragen'],['3','Ergebnisse eintragen und um Platz 1 spielen']];
+ x.textAlign='left';st.forEach((s1,i)=>{const yy=y+i*88;x.fillStyle='#1f4fff';x.beginPath();x.arc(190,yy-14,32,0,7);x.fill();x.fillStyle='#fff';x.font='900 36px system-ui,-apple-system,Arial';x.textAlign='center';x.fillText(s1[0],190,yy-1);x.textAlign='left';x.fillStyle='#0e1b3d';x.font='700 40px system-ui,-apple-system,Segoe UI,Arial';x.fillText(s1[1],250,yy)});
+ x.textAlign='center';x.fillStyle='#6c7a96';x.font='600 32px system-ui,-apple-system,Segoe UI,Arial';x.fillText('Rookie · Smash · Elite · neue Saison alle 4 Wochen',W/2,H-70);return c}
+async function posterMake(){const h=invH();if(!h)return;let u;try{u=posterCanvas(h).toDataURL('image/png')}catch(e){msg('Der Aushang konnte nicht erstellt werden.');return}window._pst=u;
+ sheet(`<h3>Aushang für ${esc(h.name)}</h3><img src='${u}' alt='Aushang mit QR-Code' style='width:100%;border-radius:12px;border:1px solid var(--br)'><div class='sub' style='margin:8px 0'>Teilen → „Drucken“ oder „In Dateien sichern“. Alternativ das Bild gedrückt halten und „Sichern“ wählen.</div><button class='btn' onclick='posterShare()'>Teilen / Drucken</button><a class='btn ghost' style='display:block;text-align:center;text-decoration:none' href='${u}' download='PADELUP-Aushang.png'>Als Bild herunterladen</a><button class='btn ghost' onclick='closeM()'>Schließen</button>`)}
+async function posterShare(){try{const b=await (await fetch(window._pst)).blob(),f=new File([b],'PADELUP-Aushang.png',{type:'image/png'});
+ if(navigator.canShare&&navigator.canShare({files:[f]})){await navigator.share({files:[f],title:'PADELUP-Aushang'});return}
+ const SH=window.Capacitor&&Capacitor.Plugins&&Capacitor.Plugins.Share;if(SH&&SH.share){await SH.share({title:'PADELUP-Aushang',url:window._pst});return}
+ msg('Teilen wird hier nicht unterstützt. Nutze „Als Bild herunterladen“ oder halte das Bild gedrückt.')}catch(e){if(e&&e.name!='AbortError')msg('Teilen hat nicht geklappt. Nutze „Als Bild herunterladen“.')}}
+/* ===== Offene Bestätigungen ===== */
+function toConfirm(){const me=S.me&&S.me.pid;if(me==null)return[];return S.matches.filter(m=>m.status=='pending'&&m.hall==S.hall&&oppSide(m).includes(me)&&!repSide(m).some(x=>(S.blocked||[]).includes(x)))}
+function myPending(){const me=S.me&&S.me.pid;if(me==null)return[];return S.matches.filter(m=>m.status=='pending'&&m.hall==S.hall&&repSide(m).includes(me))}
+function confCard(){if(isR()&&!RM.ready)return'';const a=toConfirm(),b=myPending();let h='';
+ if(a.length)h+=`<div class='card' style='padding:0;overflow:hidden;border-color:var(--rd)'><div style='padding:12px 14px'><b style='font-size:16px'>📩 Bitte bestätigen (${a.length})</b><div class='sub'>Ohne Antwort zählt ein Ergebnis nach 24 Stunden automatisch.</div></div>`+a.slice(0,3).map(m=>`<div style='padding:10px 14px;border-top:1px solid var(--br)'><b>${esc(tn(m,'w'))}</b> schlägt ${esc(tn(m,'l'))}${m.sc?' · '+esc(m.sc):''}</div>${pendUI(m)}`).join('')+(a.length>3?`<div style='padding:10px 14px;border-top:1px solid var(--br)'><span class='lnk' onclick="view='profile';render()">Alle ${a.length} im Profil ansehen ›</span></div>`:'')+`</div>`;
+ if(b.length)h+=`<div class='card'><b>⏳ ${b.length==1?'Dein Ergebnis wartet':'Deine '+b.length+' Ergebnisse warten'} auf Bestätigung</b>`+b.slice(0,3).map(m=>`<div class='row' style='cursor:default'><div class='nm' style='font-size:14px'>${esc(tn(m,'w'))} – ${esc(tn(m,'l'))}${m.sc?' · '+esc(m.sc):''}<div class='sub'>Automatisch bestätigt in ${left(Math.max(0,m.ts+DAY-Date.now()))}</div></div><button class='btn ghost' style='margin:0;padding:8px 12px;width:auto' onclick='remindOpp(${jid(m.id)})'>Erinnern</button></div>`).join('')+`</div>`;
+ return h}
+function navBadge(){let b=null;try{b=document.querySelector('#nav button[data-v=rank]')}catch(e){}if(!b||!b.querySelector)return;const n=toConfirm().length;let e=b.querySelector('.nb');if(!n){if(e)e.remove();return}if(!e){e=document.createElement('b');e.className='nb';b.appendChild(e)}e.textContent=n>9?'9+':String(n);b.setAttribute('aria-label','Rangliste, '+n+' Ergebnis'+(n==1?'':'se')+' zu bestätigen')}
+/* ===== E-Mail-Erinnerung (Server: Migration 013) ===== */
+const MAIL_LIVE=false; // auf true setzen, sobald ein E-Mail-Dienst (z. B. Brevo) in Supabase eingerichtet ist
+async function mailSet(on){try{await rpc('set_notify_email',{p_on:!!on});RM.mail=!!on;toast(on?'E-Mail-Erinnerung an':'E-Mail-Erinnerung aus')}catch(e){msg(e.message||'Das hat nicht geklappt.')}render()}
 const SB={url:'https://qnvevifgvplmqpwzsuca.supabase.co',anon:'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFudmV2aWZndnBsbXFwd3pzdWNhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTMxNzk4OTgsImV4cCI6MjEwODc1NTg5OH0.wbgfCuaolPsjObiPoK5EoBChsSGM4dw6rdGutbvvmm4',get live(){return !!(this.url&&this.anon)}};
 /* Mit Server: keine Vorschau-/Beispieldaten anzeigen, bis die echten Daten geladen sind */
 if(SB.live){const k={premium:S.premium,onb:S.onb,consent:S.consent,reports:S.reports};S=Object.assign(emptyS(),k,{halls:[{id:'none',name:'Wird geladen …',none:true}],hall:'none'})}
@@ -505,7 +1533,7 @@ function accountCard(){const x=A.session;
  const em=(x.user&&x.user.email)||'',relay=/privaterelay\.appleid\.com$/i.test(em);
  return `<div class='card'><b>Angemeldet</b><div class='sub' style='margin:4px 0 8px'>${esc(em||'Apple-Konto')}${relay?' (Apple-Weiterleitung, deine echte E-Mail bleibt privat)':''}</div><button class='btn ghost' style='margin:0' onclick='logout()'>Abmelden</button></div>`}
 function renderLogin(){const live=SB.live,gateOn=live;
- document.getElementById('login').innerHTML=`<div class='card'><div style='text-align:center'><div style='font-size:40px'>🎾</div><h3 style='font-size:22px;margin:4px 0'>PADELUP</h3><div class='sub'>${gateOn?'Die Rangliste deiner Padel-Halle. Erstelle ein Konto oder melde dich an. Danach trittst du mit dem Code deiner Halle bei.':'Melde dich an, um deine Rangliste zu nutzen.'}</div>${gateOn?`<div class='feat'><span>🏆 Rookie · Smash · Elite</span><span>📅 4-Wochen-Saisons</span><span>📸 Siegerfotos</span></div>`:''}</div>
+ document.getElementById('login').innerHTML=(live?joinHint():'')+`<div class='card'><div style='text-align:center'><div style='font-size:40px'>🎾</div><h3 style='font-size:22px;margin:4px 0'>PADELUP</h3><div class='sub'>${gateOn?'Die Rangliste deiner Padel-Halle. Erstelle ein Konto oder melde dich an. Danach trittst du mit dem Code deiner Halle bei.':'Melde dich an, um deine Rangliste zu nutzen.'}</div>${gateOn?`<div class='feat'><span>🏆 Rookie · Smash · Elite</span><span>📅 4-Wochen-Saisons</span><span>📸 Siegerfotos</span></div>`:''}</div>
 ${(NATIVE||(window.Capacitor&&Capacitor.Plugins&&Capacitor.Plugins.SignInWithApple))?`<button class='apple' onclick='appleLogin()'>${APPLE_SVG}<span>Mit Apple anmelden</span></button>
 <div class='sub' style='text-align:center;margin:14px 0 4px'>oder mit E-Mail</div>`:''}
 <label>E-Mail</label><input id='ae' type='email' inputmode='email' autocomplete='email' autocapitalize='none'>
@@ -560,7 +1588,7 @@ async function delAccount(){const p=mine();
  S.me={name:'',email:'',pid:null};S.consent=null;sweep();save();view='rank';render();toast('Konto gelöscht')}
 async function copyMyData(){if(isR())return rExport();const p=mine(),d={profil:S.me,spieler:p?Object.assign({},p,{img:null}):null,matches:p?S.matches.filter(m=>inM(m,p.id)).map(m=>Object.assign({},m,{img:null,img2:null})):[]};
  showExport(d)}
-const LEGAL_HTML="<h2 id=\"impressum\">Impressum</h2>\n<h3>Angaben gemäß § 5 DDG</h3>\n<p>Sören Meldau<br>Am Fuchsbau 34<br>29331 Lachendorf<br>Deutschland</p>\n<p><span class=\"todo\">Offen: Falls PADELUP über ein Gewerbe oder eine Firma betrieben wird: Firmenname bzw. Zusatz ergänzen.</span></p>\n<h3>Kontakt</h3>\n<p>E-Mail: s.meldau08@gmail.com<br><span class=\"todo\">Offen: zweiter schneller Kontaktweg nach § 5 Abs. 1 Nr. 2 DDG, z. B. Telefonnummer.</span></p>\n<h3>Umsatzsteuer</h3>\n<p><span class=\"todo\">Offen: Umsatzsteuer-Identifikationsnummer bzw. Wirtschafts-Identifikationsnummer angeben, falls vorhanden; sonst Abschnitt streichen.</span></p>\n<h3>Zentrale Kontaktstelle nach Art. 11 und 12 DSA</h3>\n<p>Für Behörden sowie für Nutzerinnen und Nutzer: s.meldau08@gmail.com. Sprachen: Deutsch, Englisch.</p>\n<h3>Verbraucherstreitbeilegung</h3>\n<p>Wir sind nicht bereit und nicht verpflichtet, an Streitbeilegungsverfahren vor einer Verbraucherschlichtungsstelle teilzunehmen.</p><h2 id=\"datenschutz\">Datenschutzerklärung</h2>\n<p class=\"stand\">Stand: 28. Oktober 2026</p>\n<h3>1. Verantwortlicher</h3>\n<p>Sören Meldau, Am Fuchsbau 34, 29331 Lachendorf, Deutschland, E-Mail: s.meldau08@gmail.com. Ein Datenschutzbeauftragter ist nicht benannt. <span class=\"todo\">Offen: prüfen, ob eine Benennungspflicht besteht (§ 38 BDSG).</span></p>\n\n<h3>2. Überblick</h3>\n<p>PADELUP ist eine Ranglisten-App für Padel-Hallen. In der App aus dem App Store meldest du dich mit E-Mail und Passwort oder mit „Mit Apple anmelden“ an. Deine Ranglisten-Daten liegen dann auf unserem Server. In einer Vorschau ohne Anmeldung bleiben die Daten nur auf deinem Gerät.</p>\n\n<h3>3. Welche Daten wir wofür verarbeiten</h3>\n<p><b>a) Konto und Anmeldung.</b> E-Mail-Adresse und Passwort (nur verschlüsselt als Prüfwert beim Server-Dienstleister gespeichert) bzw. bei „Mit Apple anmelden“ deine Apple-Kennung und die E-Mail-Adresse, die Apple uns mitteilt. Wenn du bei Apple „E-Mail verbergen“ wählst, erhalten wir nur eine anonyme Weiterleitungsadresse. Apple übermittelt bei der ersten Anmeldung deinen Namen, den wir nur als Vorschlag für dein Profil verwenden. Außerdem speichern wir, wann du den Nutzungsbedingungen zugestimmt hast. Zweck: Konto bereitstellen. Rechtsgrundlage: Art. 6 Abs. 1 lit. b DSGVO.</p>\n<p><b>b) Profil und Spieldaten.</b> Anzeigename, automatisch vergebene Spielernummer, selbst angegebenes Level, Profilbild (freiwillig), Mitgliedschaft und Rolle in Hallen, eingetragene und bestätigte Ergebnisse (mit Angabe, wer eingetragen hat), Punkte, Hallen-Level, Form, Saisonplatzierungen, Likes und Blockierungen. Zweck: Ranglisten, Saisons und Ergebnisbestätigung. Rechtsgrundlage: Art. 6 Abs. 1 lit. b DSGVO.</p>\n<p><b>Wer das sieht:</b> Mitglieder deiner Halle sehen Anzeigename, Spielernummer, Profilbild, Level, Liga, Punkte, Ergebnisse, Fotos, wer welches Spiel geliked hat und – wenn du Premium hast – einen Stern ⭐ hinter deinem Namen (im Profil abschaltbar). Abo-Details wie Laufzeit oder Preis sieht niemand außer dir. Deine E-Mail-Adresse sieht niemand außer uns.</p>\n<p><b>c) Fotos.</b> Sieger-, Match- und Profilfotos lädst du freiwillig hoch. Rechtsgrundlage für deine eigenen Fotos: deine Einwilligung (Art. 6 Abs. 1 lit. a DSGVO), die du jederzeit durch Löschen des Fotos oder deines Kontos widerrufen kannst. Für abgebildete andere Personen musst du deren Einverständnis haben. Vor der Veröffentlichung wird jedes Foto neu gespeichert, dabei werden eingebettete Daten wie Aufnahmeort und Kamerainformationen entfernt. Danach prüft ein automatischer Dienst (OpenAI, siehe Nr. 5), ob das Foto sexuelle Inhalte, Gewalt oder Selbstverletzung zeigt. Abgelehnte Fotos werden sofort gelöscht, wir speichern nur die Prüfkategorie ohne Bild. Rechtsgrundlage der Prüfung: unser berechtigtes Interesse, die Nutzer vor solchen Inhalten zu schützen (Art. 6 Abs. 1 lit. f DSGVO).</p>\n<p><b>d) Meldungen und Moderation.</b> Wenn du einen Beitrag, einen Spieler oder eine Anzeige meldest, speichern wir die Meldung mit deinem Konto, dem gemeldeten Inhalt und dem Grund. Hallen-Admins sehen Meldungen ihrer Halle mit dem Namen der meldenden Person. Entscheidungen (Inhalt entfernen, Ausschluss aus einer Halle) werden mit Begründung gespeichert. Betroffene und meldende Personen erhalten eine Nachricht. Rechtsgrundlage: Art. 6 Abs. 1 lit. c DSGVO in Verbindung mit Art. 16 und 17 der Verordnung über digitale Dienste (DSA) sowie Art. 6 Abs. 1 lit. f DSGVO.</p>\n<p><b>e) Mitteilungen (Push).</b> Nur wenn du Mitteilungen auf deinem iPhone erlaubst, speichern wir eine Gerätekennung und senden über Apple Hinweise, z. B. „Ergebnis bestätigen“ oder „Neue Saison“. Rechtsgrundlage: Einwilligung (Art. 6 Abs. 1 lit. a DSGVO). Widerruf: in den iPhone-Einstellungen oder durch Abmelden.</p>\n<p><b>f) Werbung.</b> In der kostenlosen Version zeigt die App Werbung von Google AdMob. Anbieter: Google Ireland Limited, Gordon House, Barrow Street, Dublin 4, Irland. Bevor Werbung erscheint, fragen wir über das Einwilligungsformular von Google, ob du der Verarbeitung für Werbung zustimmst. Ohne diese Zustimmung zeigt die App keine Werbebanner. Auf dem iPhone fragt die App zusätzlich nach der Erlaubnis zum „App-übergreifenden Tracking“ (App Tracking Transparency). Nur mit dieser Erlaubnis erhält Google die Werbe-ID deines Geräts und kann personalisierte Werbung zeigen, sonst zeigt die App nur nicht personalisierte Werbung. Dabei verarbeitet Google unter anderem IP-Adresse, Gerätedaten und Interaktionen mit Anzeigen, auch in den USA. Rechtsgrundlage: Einwilligung nach § 25 Abs. 1 TDDDG und Art. 6 Abs. 1 lit. a DSGVO. Widerruf jederzeit unter „Mehr → Werbung &amp; Datenschutz → Werbe-Einstellungen ändern“ bzw. in den iPhone-Einstellungen unter „Datenschutz &amp; Sicherheit → Tracking“. Weitere Informationen: Datenschutzerklärung von Google (policies.google.com/privacy). <span class=\"todo\">Offen: klären, ob Google bei AdMob als eigener Verantwortlicher oder gemeinsam mit uns handelt, und die passenden Google-Vertragsbedingungen im AdMob-Konto akzeptieren.</span></p>\n<p><b>Anzeigen von Hallen und Sportmarken</b> zeigen wir selbst und ohne Tracking an. Gespeichert werden nur tägliche Zähler für Anzeigen und Klicks ohne Bezug zu deiner Person. Auf deinem Gerät merkt sich die App, welche Anzeige du wie oft gesehen oder gemeldet hast.</p>\n<p><b>g) Premium.</b> Premium wird derzeit nicht angeboten. Es findet keine Kaufabwicklung statt. Vor dem Start ergänzen wir diese Erklärung.</p>\n<p><b>h) Speicherung auf deinem Gerät.</b> Die App speichert auf deinem Gerät: deine Anmeldung (in der App im iOS-Schlüsselbund), die zuletzt gewählte Halle, Einstellungen zu Mitteilungen, Anzeigen-Häufigkeit und gemeldete Anzeigen sowie in der Vorschau ohne Anmeldung alle Ranglisten-Daten. Das ist für die von dir gewünschten Funktionen unbedingt erforderlich (§ 25 Abs. 2 Nr. 2 TDDDG). Speicherung durch das Werbe-Programm von Google erfolgt nur mit deiner Einwilligung (siehe f).</p>\n<p><b>i) Technische Protokolle.</b> Beim Zugriff auf den Server verarbeitet unser Dienstleister technisch notwendige Daten wie IP-Adresse und Zeitpunkt, um den Betrieb und die Sicherheit zu gewährleisten (Art. 6 Abs. 1 lit. f DSGVO). <span class=\"todo\">Offen: Speicherdauer der Protokolle beim Server-Dienstleister ergänzen.</span></p>\n<p><b>j) Kontakt per E-Mail.</b> Wenn du uns schreibst, verarbeiten wir deine Nachricht und Adresse zur Bearbeitung (Art. 6 Abs. 1 lit. b bzw. f DSGVO).</p>\n\n<h3>4. Pflicht zur Angabe</h3>\n<p>Ohne E-Mail-Adresse bzw. Apple-Anmeldung, Anzeigenamen und Level kannst du die Ranglisten nicht nutzen. Fotos, Profilbild, Mitteilungen und personalisierte Werbung sind freiwillig.</p>\n\n<h3>5. Empfänger und Dienstleister</h3>\n<ul>\n<li><b>Supabase</b> (Datenbank, Anmeldung, Dateispeicher, Server-Funktionen), Supabase, Inc., USA, als Auftragsverarbeiter. Die Daten werden in einem Rechenzentrum in der EU (Irland) gespeichert. <span class=\"todo\">Offen: Auftragsverarbeitungsvertrag (DPA) mit Supabase abschließen.</span></li>\n<li><b>OpenAI</b> (automatische Bildprüfung) als Auftragsverarbeiter. Nach Angaben von OpenAI werden Daten der Moderations-Schnittstelle nicht zum Training und nicht für die Missbrauchsüberwachung gespeichert. Bilder werden vom Anbieter auf Darstellungen von Kindesmissbrauch geprüft. <span class=\"todo\">Offen: Vertragspartner (OpenAI, L.L.C., USA oder OpenAI Ireland Ltd.) und Auftragsverarbeitungsvertrag prüfen.</span></li>\n<li><b>Apple</b> (Mit Apple anmelden, Mitteilungen, App Store), Apple Distribution International Ltd., Hollyhill Industrial Estate, Hollyhill, Cork, Irland.</li>\n<li><b>Google</b> (Werbung), siehe Nr. 3 f.</li>\n<li><b>Hallen-Admins</b> sehen Meldungen ihrer Halle (Nr. 3 d).</li>\n</ul>\n<h3>6. Übermittlung in Drittländer</h3>\n<p>Einige Dienstleister verarbeiten Daten in den USA. Die Übermittlung stützt sich, soweit der Empfänger zertifiziert ist, auf den Angemessenheitsbeschluss der EU-Kommission zum EU-US Data Privacy Framework (Art. 45 DSGVO), sonst auf Standardvertragsklauseln (Art. 46 Abs. 2 lit. c DSGVO). <span class=\"todo\">Offen: je Dienstleister die Zertifizierung bzw. die Standardvertragsklauseln prüfen und hier nennen.</span></p>\n\n<h3>7. Speicherdauer</h3>\n<ul>\n<li>Konto, Profil und Spieldaten: bis du dein Konto löschst.</li>\n<li>Fotos: bis du sie, ein Admin sie oder du dein Konto löschst. Abgelehnte Fotos: sofort.</li>\n<li>Abgelehnte Foto-Prüfungen (nur Kategorie): 30 Tage.</li>\n<li>Mitteilungen und Moderations-Nachrichten: 90 Tage.</li>\n<li>Erledigte Meldungen: 12 Monate nach Bearbeitung.</li>\n<li>Gerätekennungen für Mitteilungen: bis zum Abmelden, zur Kontolöschung oder nach 13 Monaten ohne Nutzung.</li>\n<li>Daten auf deinem Gerät: bis du dich abmeldest oder die App löschst.</li>\n</ul>\n<p><span class=\"todo\">Offen: Fristen mit Datenschutz-Beratung bestätigen. Die Fristen sind als täglicher Aufräum-Job auf dem Server eingerichtet.</span></p>\n\n<h3>8. Konto löschen</h3>\n<p>Du kannst dein Konto jederzeit in der App unter „Profil → Konto löschen“ löschen. Gelöscht werden: Anmeldedaten, E-Mail-Adresse, Profil, Profilbild, deine Fotos, Hallenmitgliedschaften, Likes, Blockierungen, von dir erstellte Meldungen, Gerätekennungen und Nachrichten. Bei „Mit Apple anmelden“ widerrufen wir zusätzlich die Verbindung bei Apple. Bestätigte Spielergebnisse bleiben ohne deinen Namen als „Gelöschter Spieler“ erhalten, damit die Punkte anderer Spieler stimmen. Warst du einziger Admin einer Halle, wird das am längsten beigetretene Mitglied Admin.</p>\n\n<h3>9. Deine Rechte</h3>\n<p>Du hast das Recht auf Auskunft (Art. 15 DSGVO), Berichtigung (Art. 16), Löschung (Art. 17), Einschränkung der Verarbeitung (Art. 18), Datenübertragbarkeit (Art. 20) und Widerruf erteilter Einwilligungen mit Wirkung für die Zukunft (Art. 7 Abs. 3). Eine Kopie deiner Daten erhältst du in der App unter „Profil → Meine Daten kopieren“ oder per E-Mail.</p>\n<p class=\"box\"><b>Widerspruchsrecht (Art. 21 DSGVO):</b> Soweit wir Daten auf Grundlage berechtigter Interessen verarbeiten (Nr. 3 c, d und i), kannst du aus Gründen, die sich aus deiner besonderen Situation ergeben, jederzeit widersprechen. Schreib uns dazu an s.meldau08@gmail.com.</p>\n<p>Du kannst dich bei einer Datenschutz-Aufsichtsbehörde beschweren, zum Beispiel bei: Der Landesbeauftragte für den Datenschutz Niedersachsen, Prinzenstraße 5, 30159 Hannover, poststelle@lfd.niedersachsen.de.</p>\n\n<h3>10. Automatisierte Entscheidungen</h3>\n<p>Die automatische Bildprüfung entscheidet, ob ein Foto veröffentlicht wird. Eine Entscheidung mit rechtlicher oder ähnlich erheblicher Wirkung im Sinne von Art. 22 DSGVO findet nicht statt. Wenn du meinst, ein Foto wurde zu Unrecht abgelehnt, schreib uns, dann prüft es ein Mensch.</p>\n\n<h3>11. Mindestalter</h3>\n<p>PADELUP richtet sich an Personen ab 16 Jahren.</p>\n\n<h3>12. Änderungen</h3>\n<p>Wir passen diese Erklärung an, wenn sich die App oder die Rechtslage ändert. Es gilt die in der App angezeigte Fassung.</p><h2 id=\"nutzungsbedingungen\">Nutzungsbedingungen</h2>\n<p class=\"stand\">Stand: 28. Oktober 2026</p>\n<h3>1. Anbieter und Geltung</h3>\n<p>Anbieter der App PADELUP ist Sören Meldau (siehe Impressum). Diese Bedingungen gelten für die Nutzung der App. Mit der Anmeldung stimmst du ihnen zu.</p>\n<h3>2. Leistungen</h3>\n<p>PADELUP stellt Ranglisten, Ligen, Saisons, Ergebnisse und Fotos für Padel-Hallen bereit. Die Nutzung ist kostenlos. Wir bemühen uns um einen störungsfreien Betrieb, schulden aber keine ständige Verfügbarkeit. Das Hallen-Level ist ein Schätzwert von PADELUP und nicht das offizielle Level eines anderen Anbieters. Für die Richtigkeit von Ergebnissen, die Nutzer eintragen, übernehmen wir keine Gewähr.</p>\n<h3>3. Konto</h3>\n<p>Du musst mindestens 16 Jahre alt sein. Du machst wahre Angaben, nutzt nur ein Konto und hältst deine Zugangsdaten geheim. Dein Anzeigename darf keine fremden Rechte verletzen und nicht anstößig sein.</p>\n<h3>4. Ergebnisse</h3>\n<p>Trage nur Spiele ein, an denen du teilgenommen hast, und nur wahre Ergebnisse. Das gegnerische Team bestätigt oder lehnt ab. Ohne Reaktion gilt ein Ergebnis nach 24 Stunden als bestätigt.</p>\n<h3>5. Fotos und andere Inhalte</h3>\n<p>Du darfst nur Fotos hochladen, an denen du die Rechte hast. Alle erkennbar abgebildeten Personen müssen mit der Veröffentlichung in deiner Halle einverstanden sein. Bei Personen unter 16 Jahren ist das Einverständnis der Erziehungsberechtigten nötig. Du räumst uns ein einfaches, unentgeltliches Recht ein, deine Inhalte für den Betrieb der App zu speichern, technisch anzupassen (z. B. Größe ändern) und den Mitgliedern deiner Halle zu zeigen. Dieses Recht endet, wenn du den Inhalt oder dein Konto löschst. Fotos werden vor der Veröffentlichung automatisch geprüft und können abgelehnt werden.</p>\n<h3>6. Verbotene Inhalte und Verhalten</h3>\n<p>Verboten sind insbesondere: rechtswidrige Inhalte; sexuelle, pornografische oder gewaltverherrlichende Darstellungen; Beleidigungen, Bedrohungen, Belästigung, Hassrede und Diskriminierung; Fotos von Personen ohne deren Einverständnis; falsche Ergebnisse oder Manipulation der Rangliste; Spam und Werbung; Eingriffe in die Technik der App. Wir dulden keine anstößigen Inhalte und keine Nutzer, die andere missbräuchlich behandeln.</p>\n<h3>7. Melden und Blockieren</h3>\n<p>Jeden Beitrag, jeden Spieler und jede Anzeige kannst du in der App melden („Melden“) und Spieler blockieren (Spielerprofil). Rechtswidrige Inhalte können auch Personen ohne Konto per E-Mail an s.meldau08@gmail.com melden. Eine Meldung sollte enthalten: warum der Inhalt rechtswidrig ist, wo er zu finden ist (Halle, Spiel, Datum, Spieler), Name und E-Mail-Adresse sowie die Erklärung, dass die Angaben nach bestem Wissen richtig sind. Du erhältst eine Rückmeldung zu deiner Meldung. Missbräuchliche Meldungen sind verboten.</p>\n<h3>8. Moderation und Sperrung</h3>\n<p>Hallen-Admins und wir prüfen Meldungen. Wir bemühen uns, Meldungen innerhalb von 24 Stunden zu bearbeiten. Mögliche Maßnahmen sind: Foto entfernen, Ergebnis entfernen (Punkte werden zurückgerechnet), Ausschluss aus einer Halle und bei schweren oder wiederholten Verstößen die Sperrung des Kontos durch uns. Betroffene erhalten eine Begründung mit Maßnahme, Grund und Beschwerdeweg. Gegen eine Entscheidung kannst du per E-Mail an s.meldau08@gmail.com Widerspruch einlegen. Wir prüfen ihn dann erneut. <span class=\"todo\">Offen: Ablauf für Kontosperrungen durch den Anbieter festlegen (technisch über das Server-Dashboard möglich) und Bearbeitungszeit sicherstellen.</span></p>\n<h3>9. Beendigung</h3>\n<p>Du kannst dein Konto jederzeit in der App löschen. Wir können die Nutzung aus wichtigem Grund beenden, insbesondere bei schweren Verstößen gegen diese Bedingungen.</p>\n<h3>10. Premium</h3>\n<p>Premium wird derzeit nicht angeboten. Preise, Laufzeiten und Kündigungsbedingungen werden vor einem Start hier ergänzt.</p>\n<h3>11. Haftung</h3>\n<p>Wir haften unbeschränkt bei Vorsatz und grober Fahrlässigkeit, für Schäden aus der Verletzung des Lebens, des Körpers oder der Gesundheit und nach dem Produkthaftungsgesetz. Bei leicht fahrlässiger Verletzung einer wesentlichen Pflicht, deren Erfüllung die Nutzung der App erst ermöglicht, haften wir nur für den vorhersehbaren, typischen Schaden. Im Übrigen ist die Haftung für leichte Fahrlässigkeit ausgeschlossen. Für Inhalte anderer Nutzer haften wir nach den gesetzlichen Vorschriften erst, wenn wir von einem Verstoß Kenntnis erhalten.</p>\n<h3>12. Änderungen</h3>\n<p>Wir können diese Bedingungen ändern, wenn sich die App oder die Rechtslage ändert. Über wesentliche Änderungen informieren wir dich in der App rechtzeitig vorher.</p>\n<h3>13. Apple</h3>\n<p>Diese Bedingungen gelten zwischen dir und uns, nicht mit Apple. Apple ist für die App und ihre Inhalte nicht verantwortlich. Ergänzend gilt der Standard-Lizenzvertrag für Apps von Apple (Licensed Application End User License Agreement).</p>\n<h3>14. Recht</h3>\n<p>Es gilt deutsches Recht. Zwingende Verbraucherschutzvorschriften des Staates, in dem du lebst, bleiben unberührt.</p>\n<p><span class=\"todo\">Offen: Alle drei Texte vor dem Start anwaltlich prüfen lassen.</span></p>";
+const LEGAL_HTML="<h2 id=\"impressum\">Impressum</h2>\n<h3>Angaben gemäß § 5 DDG</h3>\n<p>Sören Meldau<br>Am Fuchsbau 34<br>29331 Lachendorf<br>Deutschland</p>\n<p><span class=\"todo\">Offen: Falls PADELUP über ein Gewerbe oder eine Firma betrieben wird: Firmenname bzw. Zusatz ergänzen.</span></p>\n<h3>Kontakt</h3>\n<p>E-Mail: s.meldau08@gmail.com<br><span class=\"todo\">Offen: zweiter schneller Kontaktweg nach § 5 Abs. 1 Nr. 2 DDG, z. B. Telefonnummer.</span></p>\n<h3>Umsatzsteuer</h3>\n<p><span class=\"todo\">Offen: Umsatzsteuer-Identifikationsnummer bzw. Wirtschafts-Identifikationsnummer angeben, falls vorhanden; sonst Abschnitt streichen.</span></p>\n<h3>Zentrale Kontaktstelle nach Art. 11 und 12 DSA</h3>\n<p>Für Behörden sowie für Nutzerinnen und Nutzer: s.meldau08@gmail.com. Sprachen: Deutsch, Englisch.</p>\n<h3>Verbraucherstreitbeilegung</h3>\n<p>Wir sind nicht bereit und nicht verpflichtet, an Streitbeilegungsverfahren vor einer Verbraucherschlichtungsstelle teilzunehmen.</p><h2 id=\"datenschutz\">Datenschutzerklärung</h2>\n<p class=\"stand\">Stand: 28. Oktober 2026</p>\n<h3>1. Verantwortlicher</h3>\n<p>Sören Meldau, Am Fuchsbau 34, 29331 Lachendorf, Deutschland, E-Mail: s.meldau08@gmail.com. Ein Datenschutzbeauftragter ist nicht benannt. <span class=\"todo\">Offen: prüfen, ob eine Benennungspflicht besteht (§ 38 BDSG).</span></p>\n\n<h3>2. Überblick</h3>\n<p>PADELUP ist eine Ranglisten-App für Padel-Hallen. In der App aus dem App Store meldest du dich mit E-Mail und Passwort oder mit „Mit Apple anmelden“ an. Deine Ranglisten-Daten liegen dann auf unserem Server. In einer Vorschau ohne Anmeldung bleiben die Daten nur auf deinem Gerät.</p>\n\n<h3>3. Welche Daten wir wofür verarbeiten</h3>\n<p><b>a) Konto und Anmeldung.</b> E-Mail-Adresse und Passwort (nur verschlüsselt als Prüfwert beim Server-Dienstleister gespeichert) bzw. bei „Mit Apple anmelden“ deine Apple-Kennung und die E-Mail-Adresse, die Apple uns mitteilt. Wenn du bei Apple „E-Mail verbergen“ wählst, erhalten wir nur eine anonyme Weiterleitungsadresse. Apple übermittelt bei der ersten Anmeldung deinen Namen, den wir nur als Vorschlag für dein Profil verwenden. Außerdem speichern wir, wann du den Nutzungsbedingungen zugestimmt hast. Zweck: Konto bereitstellen. Rechtsgrundlage: Art. 6 Abs. 1 lit. b DSGVO.</p>\n<p><b>b) Profil und Spieldaten.</b> Anzeigename, automatisch vergebene Spielernummer, selbst angegebenes Level, Profilbild (freiwillig), Mitgliedschaft und Rolle in Hallen, eingetragene und bestätigte Ergebnisse (mit Angabe, wer eingetragen hat), Punkte, Hallen-Level, Form, Saisonplatzierungen, Likes und Blockierungen. Zweck: Ranglisten, Saisons und Ergebnisbestätigung. Rechtsgrundlage: Art. 6 Abs. 1 lit. b DSGVO.</p>\n<p><b>Wer das sieht:</b> Mitglieder deiner Halle sehen Anzeigename, Spielernummer, Profilbild, Level, Liga, Punkte, Ergebnisse, Fotos, wer welches Spiel geliked hat und – wenn du Premium hast – einen Stern ⭐ hinter deinem Namen (im Profil abschaltbar). Abo-Details wie Laufzeit oder Preis sieht niemand außer dir. Deine E-Mail-Adresse sieht niemand außer uns.</p>\n<p><b>c) Fotos.</b> Sieger-, Match- und Profilfotos lädst du freiwillig hoch. Rechtsgrundlage für deine eigenen Fotos: deine Einwilligung (Art. 6 Abs. 1 lit. a DSGVO), die du jederzeit durch Löschen des Fotos oder deines Kontos widerrufen kannst. Für abgebildete andere Personen musst du deren Einverständnis haben. Vor der Veröffentlichung wird jedes Foto neu gespeichert, dabei werden eingebettete Daten wie Aufnahmeort und Kamerainformationen entfernt. Danach prüft ein automatischer Dienst (OpenAI, siehe Nr. 5), ob das Foto sexuelle Inhalte, Gewalt oder Selbstverletzung zeigt. Abgelehnte Fotos werden sofort gelöscht, wir speichern nur die Prüfkategorie ohne Bild. Rechtsgrundlage der Prüfung: unser berechtigtes Interesse, die Nutzer vor solchen Inhalten zu schützen (Art. 6 Abs. 1 lit. f DSGVO).</p>\n<p><b>d) Meldungen und Moderation.</b> Wenn du einen Beitrag, einen Spieler oder eine Anzeige meldest, speichern wir die Meldung mit deinem Konto, dem gemeldeten Inhalt und dem Grund. Hallen-Admins sehen Meldungen ihrer Halle mit dem Namen der meldenden Person. Entscheidungen (Inhalt entfernen, Ausschluss aus einer Halle) werden mit Begründung gespeichert. Betroffene und meldende Personen erhalten eine Nachricht. Rechtsgrundlage: Art. 6 Abs. 1 lit. c DSGVO in Verbindung mit Art. 16 und 17 der Verordnung über digitale Dienste (DSA) sowie Art. 6 Abs. 1 lit. f DSGVO.</p>\n<p><b>e) Mitteilungen (Push).</b> Nur wenn du Mitteilungen auf deinem iPhone erlaubst, speichern wir eine Gerätekennung und senden über Apple Hinweise, z. B. „Ergebnis bestätigen“ oder „Neue Saison“. Rechtsgrundlage: Einwilligung (Art. 6 Abs. 1 lit. a DSGVO). Widerruf: in den iPhone-Einstellungen oder durch Abmelden.</p>\n<p><b>E-Mail-Erinnerungen.</b> Nur wenn du sie in deinem Profil einschaltest, nutzen wir deine E-Mail-Adresse, um dich an Ergebnisse zu erinnern, die du noch bestätigen sollst (höchstens eine E-Mail pro Ergebnis). Rechtsgrundlage: Einwilligung (Art. 6 Abs. 1 lit. a DSGVO). Widerruf: Schalter im Profil. <span class=\"todo\">Offen: E-Mail-Dienstleister festlegen (z. B. Brevo), Auftragsverarbeitungsvertrag abschließen und hier sowie unter Nr. 5 nennen.</span></p>\n<p><b>f) Werbung.</b> In der kostenlosen Version zeigt die App Werbung von Google AdMob. Anbieter: Google Ireland Limited, Gordon House, Barrow Street, Dublin 4, Irland. Bevor Werbung erscheint, fragen wir über das Einwilligungsformular von Google, ob du der Verarbeitung für Werbung zustimmst. Ohne diese Zustimmung zeigt die App keine Werbebanner. Auf dem iPhone fragt die App zusätzlich nach der Erlaubnis zum „App-übergreifenden Tracking“ (App Tracking Transparency). Nur mit dieser Erlaubnis erhält Google die Werbe-ID deines Geräts und kann personalisierte Werbung zeigen, sonst zeigt die App nur nicht personalisierte Werbung. Dabei verarbeitet Google unter anderem IP-Adresse, Gerätedaten und Interaktionen mit Anzeigen, auch in den USA. Rechtsgrundlage: Einwilligung nach § 25 Abs. 1 TDDDG und Art. 6 Abs. 1 lit. a DSGVO. Widerruf jederzeit unter „Mehr → Werbung &amp; Datenschutz → Werbe-Einstellungen ändern“ bzw. in den iPhone-Einstellungen unter „Datenschutz &amp; Sicherheit → Tracking“. Weitere Informationen: Datenschutzerklärung von Google (policies.google.com/privacy). <span class=\"todo\">Offen: klären, ob Google bei AdMob als eigener Verantwortlicher oder gemeinsam mit uns handelt, und die passenden Google-Vertragsbedingungen im AdMob-Konto akzeptieren.</span></p>\n<p><b>Anzeigen von Hallen und Sportmarken</b> zeigen wir selbst und ohne Tracking an. Gespeichert werden nur tägliche Zähler für Anzeigen und Klicks ohne Bezug zu deiner Person. Auf deinem Gerät merkt sich die App, welche Anzeige du wie oft gesehen oder gemeldet hast.</p>\n<p><b>g) Premium.</b> Premium wird derzeit nicht angeboten. Es findet keine Kaufabwicklung statt. Vor dem Start ergänzen wir diese Erklärung.</p>\n<p><b>h) Speicherung auf deinem Gerät.</b> Die App speichert auf deinem Gerät: deine Anmeldung (in der App im iOS-Schlüsselbund), die zuletzt gewählte Halle, Einstellungen zu Mitteilungen, Anzeigen-Häufigkeit und gemeldete Anzeigen sowie in der Vorschau ohne Anmeldung alle Ranglisten-Daten. Das ist für die von dir gewünschten Funktionen unbedingt erforderlich (§ 25 Abs. 2 Nr. 2 TDDDG). Speicherung durch das Werbe-Programm von Google erfolgt nur mit deiner Einwilligung (siehe f).</p>\n<p><b>i) Technische Protokolle.</b> Beim Zugriff auf den Server verarbeitet unser Dienstleister technisch notwendige Daten wie IP-Adresse und Zeitpunkt, um den Betrieb und die Sicherheit zu gewährleisten (Art. 6 Abs. 1 lit. f DSGVO). <span class=\"todo\">Offen: Speicherdauer der Protokolle beim Server-Dienstleister ergänzen.</span></p>\n<p><b>j) Kontakt per E-Mail.</b> Wenn du uns schreibst, verarbeiten wir deine Nachricht und Adresse zur Bearbeitung (Art. 6 Abs. 1 lit. b bzw. f DSGVO).</p>\n\n<h3>4. Pflicht zur Angabe</h3>\n<p>Ohne E-Mail-Adresse bzw. Apple-Anmeldung, Anzeigenamen und Level kannst du die Ranglisten nicht nutzen. Fotos, Profilbild, Mitteilungen und personalisierte Werbung sind freiwillig.</p>\n\n<h3>5. Empfänger und Dienstleister</h3>\n<ul>\n<li><b>Supabase</b> (Datenbank, Anmeldung, Dateispeicher, Server-Funktionen), Supabase, Inc., USA, als Auftragsverarbeiter. Die Daten werden in einem Rechenzentrum in der EU (Irland) gespeichert. <span class=\"todo\">Offen: Auftragsverarbeitungsvertrag (DPA) mit Supabase abschließen.</span></li>\n<li><b>OpenAI</b> (automatische Bildprüfung) als Auftragsverarbeiter. Nach Angaben von OpenAI werden Daten der Moderations-Schnittstelle nicht zum Training und nicht für die Missbrauchsüberwachung gespeichert. Bilder werden vom Anbieter auf Darstellungen von Kindesmissbrauch geprüft. <span class=\"todo\">Offen: Vertragspartner (OpenAI, L.L.C., USA oder OpenAI Ireland Ltd.) und Auftragsverarbeitungsvertrag prüfen.</span></li>\n<li><b>Apple</b> (Mit Apple anmelden, Mitteilungen, App Store), Apple Distribution International Ltd., Hollyhill Industrial Estate, Hollyhill, Cork, Irland.</li>\n<li><b>Google</b> (Werbung), siehe Nr. 3 f.</li>\n<li><b>Hallen-Admins</b> sehen Meldungen ihrer Halle (Nr. 3 d).</li>\n</ul>\n<h3>6. Übermittlung in Drittländer</h3>\n<p>Einige Dienstleister verarbeiten Daten in den USA. Die Übermittlung stützt sich, soweit der Empfänger zertifiziert ist, auf den Angemessenheitsbeschluss der EU-Kommission zum EU-US Data Privacy Framework (Art. 45 DSGVO), sonst auf Standardvertragsklauseln (Art. 46 Abs. 2 lit. c DSGVO). <span class=\"todo\">Offen: je Dienstleister die Zertifizierung bzw. die Standardvertragsklauseln prüfen und hier nennen.</span></p>\n\n<h3>7. Speicherdauer</h3>\n<ul>\n<li>Konto, Profil und Spieldaten: bis du dein Konto löschst.</li>\n<li>Fotos: bis du sie, ein Admin sie oder du dein Konto löschst. Abgelehnte Fotos: sofort.</li>\n<li>Abgelehnte Foto-Prüfungen (nur Kategorie): 30 Tage.</li>\n<li>Mitteilungen und Moderations-Nachrichten: 90 Tage.</li>\n<li>Erledigte Meldungen: 12 Monate nach Bearbeitung.</li>\n<li>Gerätekennungen für Mitteilungen: bis zum Abmelden, zur Kontolöschung oder nach 13 Monaten ohne Nutzung.</li>\n<li>Daten auf deinem Gerät: bis du dich abmeldest oder die App löschst.</li>\n</ul>\n<p><span class=\"todo\">Offen: Fristen mit Datenschutz-Beratung bestätigen. Die Fristen sind als täglicher Aufräum-Job auf dem Server eingerichtet.</span></p>\n\n<h3>8. Konto löschen</h3>\n<p>Du kannst dein Konto jederzeit in der App unter „Profil → Konto löschen“ löschen. Gelöscht werden: Anmeldedaten, E-Mail-Adresse, Profil, Profilbild, deine Fotos, Hallenmitgliedschaften, Likes, Blockierungen, von dir erstellte Meldungen, Gerätekennungen und Nachrichten. Bei „Mit Apple anmelden“ widerrufen wir zusätzlich die Verbindung bei Apple. Bestätigte Spielergebnisse bleiben ohne deinen Namen als „Gelöschter Spieler“ erhalten, damit die Punkte anderer Spieler stimmen. Warst du einziger Admin einer Halle, wird das am längsten beigetretene Mitglied Admin.</p>\n\n<h3>9. Deine Rechte</h3>\n<p>Du hast das Recht auf Auskunft (Art. 15 DSGVO), Berichtigung (Art. 16), Löschung (Art. 17), Einschränkung der Verarbeitung (Art. 18), Datenübertragbarkeit (Art. 20) und Widerruf erteilter Einwilligungen mit Wirkung für die Zukunft (Art. 7 Abs. 3). Eine Kopie deiner Daten erhältst du in der App unter „Profil → Meine Daten kopieren“ oder per E-Mail.</p>\n<p class=\"box\"><b>Widerspruchsrecht (Art. 21 DSGVO):</b> Soweit wir Daten auf Grundlage berechtigter Interessen verarbeiten (Nr. 3 c, d und i), kannst du aus Gründen, die sich aus deiner besonderen Situation ergeben, jederzeit widersprechen. Schreib uns dazu an s.meldau08@gmail.com.</p>\n<p>Du kannst dich bei einer Datenschutz-Aufsichtsbehörde beschweren, zum Beispiel bei: Der Landesbeauftragte für den Datenschutz Niedersachsen, Prinzenstraße 5, 30159 Hannover, poststelle@lfd.niedersachsen.de.</p>\n\n<h3>10. Automatisierte Entscheidungen</h3>\n<p>Die automatische Bildprüfung entscheidet, ob ein Foto veröffentlicht wird. Eine Entscheidung mit rechtlicher oder ähnlich erheblicher Wirkung im Sinne von Art. 22 DSGVO findet nicht statt. Wenn du meinst, ein Foto wurde zu Unrecht abgelehnt, schreib uns, dann prüft es ein Mensch.</p>\n\n<h3>11. Mindestalter</h3>\n<p>PADELUP richtet sich an Personen ab 16 Jahren.</p>\n\n<h3>12. Änderungen</h3>\n<p>Wir passen diese Erklärung an, wenn sich die App oder die Rechtslage ändert. Es gilt die in der App angezeigte Fassung.</p><h2 id=\"nutzungsbedingungen\">Nutzungsbedingungen</h2>\n<p class=\"stand\">Stand: 28. Oktober 2026</p>\n<h3>1. Anbieter und Geltung</h3>\n<p>Anbieter der App PADELUP ist Sören Meldau (siehe Impressum). Diese Bedingungen gelten für die Nutzung der App. Mit der Anmeldung stimmst du ihnen zu.</p>\n<h3>2. Leistungen</h3>\n<p>PADELUP stellt Ranglisten, Ligen, Saisons, Ergebnisse und Fotos für Padel-Hallen bereit. Die Nutzung ist kostenlos. Wir bemühen uns um einen störungsfreien Betrieb, schulden aber keine ständige Verfügbarkeit. Das Hallen-Level ist ein Schätzwert von PADELUP und nicht das offizielle Level eines anderen Anbieters. Für die Richtigkeit von Ergebnissen, die Nutzer eintragen, übernehmen wir keine Gewähr.</p>\n<h3>3. Konto</h3>\n<p>Du musst mindestens 16 Jahre alt sein. Du machst wahre Angaben, nutzt nur ein Konto und hältst deine Zugangsdaten geheim. Dein Anzeigename darf keine fremden Rechte verletzen und nicht anstößig sein.</p>\n<h3>4. Ergebnisse</h3>\n<p>Trage nur Spiele ein, an denen du teilgenommen hast, und nur wahre Ergebnisse. Das gegnerische Team bestätigt oder lehnt ab. Ohne Reaktion gilt ein Ergebnis nach 24 Stunden als bestätigt.</p>\n<h3>5. Fotos und andere Inhalte</h3>\n<p>Du darfst nur Fotos hochladen, an denen du die Rechte hast. Alle erkennbar abgebildeten Personen müssen mit der Veröffentlichung in deiner Halle einverstanden sein. Bei Personen unter 16 Jahren ist das Einverständnis der Erziehungsberechtigten nötig. Du räumst uns ein einfaches, unentgeltliches Recht ein, deine Inhalte für den Betrieb der App zu speichern, technisch anzupassen (z. B. Größe ändern) und den Mitgliedern deiner Halle zu zeigen. Dieses Recht endet, wenn du den Inhalt oder dein Konto löschst. Fotos werden vor der Veröffentlichung automatisch geprüft und können abgelehnt werden.</p>\n<h3>6. Verbotene Inhalte und Verhalten</h3>\n<p>Verboten sind insbesondere: rechtswidrige Inhalte; sexuelle, pornografische oder gewaltverherrlichende Darstellungen; Beleidigungen, Bedrohungen, Belästigung, Hassrede und Diskriminierung; Fotos von Personen ohne deren Einverständnis; falsche Ergebnisse oder Manipulation der Rangliste; Spam und Werbung; Eingriffe in die Technik der App. Wir dulden keine anstößigen Inhalte und keine Nutzer, die andere missbräuchlich behandeln.</p>\n<h3>7. Melden und Blockieren</h3>\n<p>Jeden Beitrag, jeden Spieler und jede Anzeige kannst du in der App melden („Melden“) und Spieler blockieren (Spielerprofil). Rechtswidrige Inhalte können auch Personen ohne Konto per E-Mail an s.meldau08@gmail.com melden. Eine Meldung sollte enthalten: warum der Inhalt rechtswidrig ist, wo er zu finden ist (Halle, Spiel, Datum, Spieler), Name und E-Mail-Adresse sowie die Erklärung, dass die Angaben nach bestem Wissen richtig sind. Du erhältst eine Rückmeldung zu deiner Meldung. Missbräuchliche Meldungen sind verboten.</p>\n<h3>8. Moderation und Sperrung</h3>\n<p>Hallen-Admins und wir prüfen Meldungen. Wir bemühen uns, Meldungen innerhalb von 24 Stunden zu bearbeiten. Mögliche Maßnahmen sind: Foto entfernen, Ergebnis entfernen (Punkte werden zurückgerechnet), Ausschluss aus einer Halle und bei schweren oder wiederholten Verstößen die Sperrung des Kontos durch uns. Betroffene erhalten eine Begründung mit Maßnahme, Grund und Beschwerdeweg. Gegen eine Entscheidung kannst du per E-Mail an s.meldau08@gmail.com Widerspruch einlegen. Wir prüfen ihn dann erneut. <span class=\"todo\">Offen: Ablauf für Kontosperrungen durch den Anbieter festlegen (technisch über das Server-Dashboard möglich) und Bearbeitungszeit sicherstellen.</span></p>\n<h3>9. Beendigung</h3>\n<p>Du kannst dein Konto jederzeit in der App löschen. Wir können die Nutzung aus wichtigem Grund beenden, insbesondere bei schweren Verstößen gegen diese Bedingungen.</p>\n<h3>10. Premium</h3>\n<p>Premium wird derzeit nicht angeboten. Preise, Laufzeiten und Kündigungsbedingungen werden vor einem Start hier ergänzt.</p>\n<h3>11. Haftung</h3>\n<p>Wir haften unbeschränkt bei Vorsatz und grober Fahrlässigkeit, für Schäden aus der Verletzung des Lebens, des Körpers oder der Gesundheit und nach dem Produkthaftungsgesetz. Bei leicht fahrlässiger Verletzung einer wesentlichen Pflicht, deren Erfüllung die Nutzung der App erst ermöglicht, haften wir nur für den vorhersehbaren, typischen Schaden. Im Übrigen ist die Haftung für leichte Fahrlässigkeit ausgeschlossen. Für Inhalte anderer Nutzer haften wir nach den gesetzlichen Vorschriften erst, wenn wir von einem Verstoß Kenntnis erhalten.</p>\n<h3>12. Änderungen</h3>\n<p>Wir können diese Bedingungen ändern, wenn sich die App oder die Rechtslage ändert. Über wesentliche Änderungen informieren wir dich in der App rechtzeitig vorher.</p>\n<h3>13. Apple</h3>\n<p>Diese Bedingungen gelten zwischen dir und uns, nicht mit Apple. Apple ist für die App und ihre Inhalte nicht verantwortlich. Ergänzend gilt der Standard-Lizenzvertrag für Apps von Apple (Licensed Application End User License Agreement).</p>\n<h3>14. Recht</h3>\n<p>Es gilt deutsches Recht. Zwingende Verbraucherschutzvorschriften des Staates, in dem du lebst, bleiben unberührt.</p>\n<p><span class=\"todo\">Offen: Alle drei Texte vor dem Start anwaltlich prüfen lassen.</span></p>";
 function legalGo(id){const e=document.getElementById(id);if(e)e.scrollIntoView({behavior:'smooth',block:'start'})}
 function renderLegal(){document.getElementById('legal').innerHTML=`<div class='card lnav'><button onclick="legalGo('impressum')">Impressum</button><button onclick="legalGo('datenschutz')">Datenschutz</button><button onclick="legalGo('nutzungsbedingungen')">Nutzungsbedingungen</button></div><div class='card legal'>`+LEGAL_HTML+`</div>`}
 const MOD={url:''};
@@ -604,7 +1632,7 @@ function setAdUi(){const web=AD.demo&&!NATIVE&&wantBanner(),vis=!!((NATIVE&&AD.v
  if(document.documentElement)document.documentElement.style.setProperty('--adh',(vis?(web?50:(AD.adh||50)):0)+'px');
  if(document.body)document.body.classList.toggle('ad-on',vis);
  document.getElementById('adbar').classList.toggle('hide',!vis);document.getElementById('demobanner').classList.toggle('hide',!web)}
-function afterRender(){document.body.classList.toggle('gated',SB.live&&!A.session);injectFeedAds();syncBanner()}
+function afterRender(){document.body.classList.toggle('gated',SB.live&&!A.session);navBadge();injectFeedAds();syncBanner()}
 async function loadAds(){if(AD.demo&&!NATIVE){AD.camps=DEMO_CAMPS.slice();return}
  if(!SB.live||!A.session){AD.camps=[];return}const t=await freshToken();if(!t)return;
  const r=await sbFetch('/rest/v1/ad_campaigns?select=id,advertiser,headline,body,image_url,cta_label,cta_url&order=created_at.desc&limit=10',{token:t});
@@ -677,15 +1705,16 @@ function remoteLoad(){if(!isR())return Promise.resolve();if(RM.busy)return RM.bu
   me:{name:RM.profile?RM.profile.display_name:(RM.suggest||''),email:(A.session.user&&A.session.user.email)||'',pid:RM.profile&&RM.hall?uid:null,lv:(S.me&&S.me.lv)||null}},keep);
  try{RM.owner=!!(await rpc('is_app_admin',{}))}catch(e){RM.owner=false}
  RM.ss=null;if(RM.hall){try{RM.ss=await rpc('my_season_status',{p_hall:RM.hall})}catch(e){}}
+ RM.mail=null;if(RM.profile){try{RM.mail=!!(await rpc('my_notify_email',{}))}catch(e){}}
  try{RM.notes=await rq(`/rest/v1/notifications?kind=eq.moderation&select=title,body,created_at&order=created_at.desc&limit=5`)}catch(e){RM.notes=[]}
  RM.nrep=0;RM.nlv=0;if(RM.hall&&(mem.find(x=>x.hall_id==RM.hall)||{}).role=='admin'){try{RM.nrep=(await rpc('admin_reports',{p_hall:RM.hall})).length}catch(e){}try{RM.nlv=(await rpc('level_requests',{p_hall:RM.hall})).length}catch(e){}}
- const me=mine();if(me&&!RM.ready)cur=me.league;RM.err=null;RM.ready=true;setTimeout(pushInit,0);setTimeout(seasonPrompt,2600)}catch(e){RM.err=e.message||'Laden fehlgeschlagen.';RM.ready=true}finally{RM.busy=null}})();return RM.busy}
+ const me=mine();if(me&&!RM.ready)cur=me.league;RM.err=null;RM.ready=true;setTimeout(pushInit,0);setTimeout(seasonPrompt,2600);setTimeout(joinPending,30)}catch(e){RM.err=e.message||'Laden fehlgeschlagen.';RM.ready=true}finally{RM.busy=null}})();return RM.busy}
 async function rRun(fn,okTxt,go){if(window._rb)return;window._rb=true;try{await fn();await remoteLoad();if(go)view=go;render();if(okTxt)toast(okTxt)}catch(e){msg(e.message||'Das hat nicht geklappt.')}finally{window._rb=false}}
 function myLevel(){const p=mine();return p?p.lv:(S.me&&S.me.lv)}
 function rSetHall(id){if(id=='none')return;RM.hall=id;RM.hist=null;lsSet('padel_rhall',id);RM.ready=false;view='rank';q='';render();remoteLoad().then(()=>render())}
 function rAddHall(n){const lv=myLevel();if(lv==null){msg('Bitte lege zuerst dein Profil mit deinem Level an.');view='profile';render();return}
  rRun(async()=>{const id=await rpc('create_hall',{p_name:n,p_level:lv});RM.hall=id;lsSet('padel_rhall',id)},'Halle angelegt. Teile jetzt den Hallencode.','halls')}
-function rJoin(){const c=(document.getElementById('jcode').value||'').trim(),lv=myLevel();if(c.length<4){msg('Bitte gib den Hallencode ein.');return}
+function rJoin(){const c=(document.getElementById('jcode').value||'').trim(),lv=myLevel();joinClear();if(c.length<4){msg('Bitte gib den Hallencode ein.');return}
  if(!RM.profile||lv==null){msg('Bitte lege zuerst dein Profil mit deinem Level an.');view='profile';render();return}
  rRun(async()=>{const id=await rpc('join_hall',{p_code:c,p_level:lv});RM.hall=id;lsSet('padel_rhall',id)},'Willkommen in deiner Halle!','rank')}
 function rRename(n){rRun(async()=>{await rpc('rename_hall',{p_hall:RM.hall,p_name:n});closeM()},'Halle umbenannt')}
@@ -693,8 +1722,8 @@ function copyCode(c){try{navigator.clipboard.writeText(c).then(()=>toast('Hallen
 function rInvite(){const h=curHall();if(!h||h.none){view='halls';render();return}msg('Neue Spieler laden sich PADELUP, legen ein Konto an und treten deiner Halle mit dem Hallencode '+h.code+' bei.')}
 function rRenderHalls(){const hs=S.halls.filter(h=>!h.none),h=curHall(),adm=h&&h.role=='admin';
  document.getElementById('halls').innerHTML=(hs.length?`<div class="card"><h3>Deine Hallen</h3>`+hs.map(x=>`<div class="row" onclick="setHall('${safeId(x.id)}')"><span style="font-size:22px">🏟️</span><div class="nm">${esc(x.name)}<div class="sub">${x.role=='admin'?'Admin · ':''}Code ${esc(x.code||'')}</div></div>${x.id==S.hall?'<span class="pill">Aktiv</span>':'<span class="sub">Wechseln ›</span>'}</div>`).join('')+`</div>`:'')
- +(h&&!h.none?`<div class="card"><h3>Spieler einladen</h3><div class="sub" style="font-size:14px;color:var(--tx);line-height:1.6">Neue Spieler treten mit diesem Code bei:</div><div style="font-size:28px;font-weight:800;letter-spacing:3px;margin:8px 0;user-select:all">${esc(h.code||'')}</div><button class="btn ghost" style="margin:0" onclick="copyCode('${safeId(h.code||'')}')">Code kopieren</button>${adm?`<button class="btn ghost" onclick="renameHall()">Halle umbenennen</button>`:''}</div>`:'')
- +`<div class="card"><h3>Halle beitreten</h3><input id="jcode" placeholder="Hallencode, z. B. 4F7A9C21" maxlength="12" autocapitalize="characters" autocomplete="off"><button class="btn" onclick="rJoin()">Beitreten</button></div>`
+ +(h&&!h.none?`<div class="card"><h3>Spieler einladen</h3><div class="sub" style="font-size:14px;color:var(--tx);line-height:1.6">Neue Spieler treten mit diesem Code bei:</div><div style="font-size:28px;font-weight:800;letter-spacing:3px;margin:8px 0;user-select:all">${esc(h.code||'')}</div>${h.code?`<div class="center" style="margin:6px 0 10px"><div class="qrbox" onclick="qrShow()" style="cursor:pointer">${qrSvg(joinUrl(h.code),190)}</div><div class="sub" style="margin-top:6px">Scannen öffnet PADELUP und tritt direkt bei</div></div><button class="btn" style="margin:0 0 8px" onclick="shareSheet(invText('hall'),'Spieler einladen')">Einladung senden</button><button class="btn ghost" style="margin:0 0 8px" onclick="posterMake()">Aushang zum Ausdrucken</button>`:''}<button class="btn ghost" style="margin:0" onclick="copyCode('${safeId(h.code||'')}')">Code kopieren</button>${adm?`<button class="btn ghost" onclick="renameHall()">Halle umbenennen</button>`:''}</div>`:'')
+ +`<div class="card"><h3>Halle beitreten</h3><input id="jcode" placeholder="Hallencode, z. B. 4F7A9C21" maxlength="12" autocapitalize="characters" autocomplete="off" value="${esc(lsGet('padel_join','')||'')}"><button class="btn" onclick="rJoin()">Beitreten</button></div>`
  +`<div class="card"><h3>Neue Halle anlegen</h3><div class="sub" style="margin-bottom:6px">Für Hallenbetreiber. Du wirst automatisch Admin.</div><input id="hnn" placeholder="Name der Halle" maxlength="60"><button class="btn lime" onclick="addHall()">Halle anlegen</button></div>`}
 async function blobOf(dataUrl){return await (await fetch(dataUrl)).blob()}
 async function uploadChecked(dataUrl){const t=await freshToken();if(!t)throw new Error('Bitte melde dich erneut an.');const uid=A.session.user.id,path=uid+'/'+rnd(12)+'.jpg';
@@ -741,7 +1770,7 @@ async function pushInit(){const P=pushPlugin();if(!P||!NATIVE||!isR()||!RM.profi
  if(!PU.inited){PU.inited=true;
   P.addListener('registration',async t=>{const v=t&&t.value;if(!v)return;PU.tok=v;lsSet('padel_pushtok',v);try{await rpc('register_push_token',{p_token:v,p_platform:(window.Capacitor.getPlatform&&window.Capacitor.getPlatform()=='android')?'android':'ios'})}catch(e){}});
   P.addListener('registrationError',()=>{PU.state='error'});
-  P.addListener('pushNotificationActionPerformed',a=>{const d=(a&&a.notification&&a.notification.data)||{};view=d.kind=='new_season'?'season':(d.kind=='confirm_request'?'profile':'feed');remoteLoad().then(()=>render())});
+  P.addListener('pushNotificationActionPerformed',a=>{const d=(a&&a.notification&&a.notification.data)||{};view=d.kind=='new_season'?'season':(d.kind=='confirm_request'?'rank':'feed');remoteLoad().then(()=>render())});
   P.addListener('pushNotificationReceived',n=>{if(n&&n.title)toast(n.title);remoteLoad().then(()=>render())})}
  let p;try{p=(await P.checkPermissions()).receive}catch(e){return}PU.state=p;
  if(p==='granted'){try{await P.register()}catch(e){}return}
@@ -752,8 +1781,8 @@ async function pushEnable(){const P=pushPlugin();if(!P){msg('Mitteilungen gibt e
  if(p==='granted'){try{await P.register();toast('Mitteilungen sind an')}catch(e){msg('Mitteilungen konnten nicht aktiviert werden. Bitte versuche es später erneut.')}}
  else msg('Mitteilungen sind ausgeschaltet. Du kannst sie in den iPhone-Einstellungen unter „PADELUP“ → „Mitteilungen“ einschalten.');if(view=='profile')render()}
 async function pushOff(){if(PU.tok&&isR()){try{await rpc('unregister_push_token',{p_token:PU.tok})}catch(e){}}}
-function pushCard(){if(!NATIVE||!isR()||!RM.profile)return'';const on=PU.state==='granted';
- return `<div class='card'><h3>🔔 Mitteilungen</h3><div class='sub' style='font-size:14px;color:var(--tx);margin-bottom:8px'>${on?'An: Wir melden uns bei Ergebnissen zum Bestätigen und bei neuen Saisons.':'Aus. Schalte sie ein, damit du keine Bestätigung verpasst.'}</div>${on?'':`<button class='btn' style='margin:0' onclick='pushEnable()'>Mitteilungen einschalten</button>`}</div>`}
+function pushCard(){if(!isR()||!RM.profile)return'';const ml=RM.mail!=null&&RM.mail!==undefined;if(!NATIVE&&!ml)return'';const on=PU.state==='granted',em=(A.session&&A.session.user&&A.session.user.email)||'';
+ return `<div class='card'><h3>🔔 Mitteilungen</h3>${NATIVE?`<div class='sub' style='font-size:14px;color:var(--tx);margin-bottom:8px'>${on?'An: Wir melden uns bei Ergebnissen zum Bestätigen und bei neuen Saisons.':'Aus. Schalte sie ein, damit du keine Bestätigung verpasst.'}</div>${on?'':`<button class='btn' style='margin:0' onclick='pushEnable()'>Mitteilungen einschalten</button>`}`:''}${ml?`<label class='chk' style='margin:${NATIVE?'10px':'0'} 0 0'><input type='checkbox' id='mailon' ${RM.mail?'checked':''} onchange='mailSet(this.checked)'><span>📧 E-Mail-Erinnerung, wenn ein Ergebnis nach 3 Stunden noch nicht bestätigt ist${em?' (an '+esc(em)+')':''}</span></label>${MAIL_LIVE?'':`<div class='sub' style='margin-top:6px'>Der E-Mail-Versand wird gerade eingerichtet. Deine Einstellung wird gespeichert und gilt, sobald er startet.</div>`}`:''}</div>`}
 /* ===== Admin: Meldungen prüfen (nur Hallen-Admins, nur Server-Modus) ===== */
 const ADM={list:null,urls:{},busy:false};
 async function loadAdmin(){try{ADM.lv=await rpc('level_requests',{p_hall:ADM.hall||RM.hall})}catch(e){ADM.lv=[]}try{ADM.list=await rpc('admin_reports',{p_hall:ADM.hall||RM.hall});ADM.urls=await signUrls(ADM.list.flatMap(r=>[r.winner_photo_path,r.match_photo_path]))}catch(e){ADM.list=[];msg(e.message)}RM.nrep=(ADM.list||[]).length;if(view=='admin')render()}
@@ -919,12 +1948,12 @@ function rfPhoto(quiet){const f=(document.getElementById(RF.pk=='win'?'ph':'ph2'
 function rfPick(side,i){const me=S.me&&S.me.pid,taken=[...RF.w,...RF.l].filter((x,k)=>x!=null&&!(['w','l'][Math.floor(k/2)]==side&&k%2==i));
  const recent=[];S.matches.slice().reverse().forEach(m=>{if(m.hall==S.hall&&me!=null&&inM(m,me))[...W(m),...L(m)].forEach(id=>{if(id!=me&&!recent.includes(id)&&rfP(id))recent.push(id)})});
  RF.pick={side,i,taken,recent:recent.slice(0,6)};
- sheet(`<h3>${side=='w'?'Gewinner':'Verlierer'} wählen</h3><input id="rfq" placeholder="Name oder #Nummer" autocomplete="off" oninput="rfPickList()"><div class="pick" id="rfpl"></div>${RF[side][i]!=null?`<button class="btn ghost" onclick="RF['${side}'][${i}]=null;rfSync();closeM();rfRender()">Platz leeren</button>`:''}<button class="btn ghost" onclick="closeM()">Abbrechen</button>`);rfPickList()}
+ sheet(`<h3>${side=='w'?'Gewinner':'Verlierer'} wählen</h3><input id="rfq" placeholder="Name oder #Nummer" autocomplete="off" oninput="rfPickList()"><div class="pick" id="rfpl"></div>${invH()?`<button class="btn ghost" style="border-style:dashed" onclick="inviteOpp()">➕ Nicht dabei? Per WhatsApp einladen</button>`:''}${RF[side][i]!=null?`<button class="btn ghost" onclick="RF['${side}'][${i}]=null;rfSync();closeM();rfRender()">Platz leeren</button>`:''}<button class="btn ghost" onclick="closeM()">Abbrechen</button>`);rfPickList()}
 function rfPickList(){const k=RF.pick,q0=(document.getElementById('rfq').value||'').trim().toLowerCase().replace(/^#/,''),me=S.me&&S.me.pid;
  const row=p=>{const off=k.taken.includes(p.id);return `<div class="row${off?' off':''}" onclick="rfChoose(${jid(p.id)})">${av(p,36)}<div class="nm">${esc(p.name)}${p.id==me?' (Du)':''} <span class="no">#${esc(p.no||'')}</span><div class="sub">${esc((LEAGUES.find(l=>l.id==p.league)||{}).name||'')} · Level ${fmt(p.lv)}${off?' · schon gewählt':''}</div></div></div>`};
  const all=rfAll().filter(p=>!q0||p.name.toLowerCase().includes(q0)||String(p.no||'').startsWith(q0));
  const rec=q0?[]:k.recent.map(rfP).filter(Boolean);const meP=q0?null:rfP(me);
- document.getElementById('rfpl').innerHTML=(meP?'<h4>Du</h4>'+row(meP):'')+(rec.length?'<h4>Zuletzt gespielt</h4>'+rec.map(row).join(''):'')+'<h4>'+(q0?'Treffer':'Alle Spieler')+'</h4>'+(all.filter(p=>q0||p.id!=me).map(row).join('')||`<div class="empty">Kein Spieler gefunden.</div>`)}
+ document.getElementById('rfpl').innerHTML=(meP?'<h4>Du</h4>'+row(meP):'')+(rec.length?'<h4>Zuletzt gespielt</h4>'+rec.map(row).join(''):'')+'<h4>'+(q0?'Treffer':'Alle Spieler')+'</h4>'+(all.filter(p=>q0||p.id!=me).map(row).join('')||`<div class="empty">Kein Spieler gefunden.${invH()?' Vielleicht ist er noch nicht in PADELUP – lade ihn unten ein.':''}</div>`)}
 function rfChoose(id){const k=RF.pick;if(!k||k.taken.includes(id))return;RF[k.side][k.i]=id;rfSync();closeM();rfRender()}
 
 /* ===== Level pro Saison ===== */
@@ -1017,7 +2046,7 @@ function themeSet(t){lsSet('padel_theme',t);themeApply();render()}
 try{matchMedia('(prefers-color-scheme: dark)').addEventListener('change',()=>{if(themeGet()=='auto')themeApply()})}catch(e){}
 function themeCard(){const t=themeGet(),b=(k,l)=>`<button type="button" class="${t==k?'on':''}" onclick="themeSet('${k}')">${l}</button>`;return `<div class="card"><h3>🌓 Darstellung</h3><div class="thm">${b('auto','Automatisch')}${b('light','☀️ Hell')}${b('dark','🌙 Dunkel')}</div><div class="sub" style="margin-top:6px">„Automatisch“ folgt der Einstellung deines iPhones.</div></div>`}
 /* ===== Automatische Aktualisierung (nur Website-Version): neue Version erkennen und neu laden ===== */
-const APP_VERSION='20261029-132324';
+const APP_VERSION='20261029-140136';
 async function updCheck(){if(NATIVE||!SB.live||APP_VERSION=='dev'||document.hidden)return;
  try{const r=await fetch('version.json?ts='+Date.now(),{cache:'no-store'});if(!r.ok)return;const v=(await r.json()).v;if(!v||v==APP_VERSION)return;
   let tried=null;try{tried=sessionStorage.getItem('padel_upd')}catch(e){}if(tried==v)return;
@@ -1044,7 +2073,7 @@ window.addEventListener('storage',e=>{if(e.key=='padel3')reloadS()});{const mp=m
 AD.wait=!!(SB.live&&(A.session||secPlugin()));if(AD.wait)setTimeout(()=>{if(AD.wait){AD.wait=false;render()}},5000);
 SEC_READY.then(()=>{const sp=!!secPlugin();if(sp)AD.wait=!!(SB.live&&A.session);if(A.session&&view=='login')view='rank';if(isR())remoteLoad().then(()=>render());if(sp&&A.session){billInit();syncPremium().then(()=>render())}render()});setInterval(()=>{if(isR()&&!document.hidden)remoteLoad().then(()=>render())},12e4);
 if(!secPlugin()){billInit();if(A.session)syncPremium().then(()=>render())}loadAds().then(()=>{if(view=='feed')render()});setInterval(()=>{loadAds().then(()=>{if(view=='feed')render()})},18e5);
-dbInit();
+joinGet();dbInit();
 tick();(function(){const c=document.querySelectorAll('#add .card')[1],r=document.createElement('div');r.id='res';r.className='hide';r.appendChild(c);document.getElementById('add').after(r)})();render();setTimeout(seasonPrompt,400);setInterval(()=>{if(tick()){render();seasonPrompt()}else{renderSeason();if(view=='feed')render()}},60000);
 </script>
 </body>
