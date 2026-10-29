@@ -1527,7 +1527,7 @@ async function serverDelete(){const t=await freshToken();if(!t){msg('Bitte melde
  if((u.identities||[]).some(i=>i.provider=='apple')||(u.app_metadata&&u.app_metadata.provider=='apple')){
   try{const a=await appleAuthorize();appleCode=a.r.authorizationCode||null}catch(e){msg('Zum Löschen deines Kontos musst du dich kurz erneut mit Apple bestätigen.');return false}}
  const r=await sbFetch('/functions/v1/delete-account',{method:'POST',token:t,body:{appleCode}});
- if(!r.ok){msg('Das Konto konnte nicht gelöscht werden. Es wurde nichts gelöscht. Bitte versuche es später erneut.');return false}
+ if(!r.ok){const d=(r.json&&r.json.error)||(r.error=='network'?'keine Verbindung':'Fehler '+r.status);msg('Das Konto konnte nicht gelöscht werden. Bitte versuche es später erneut. (Server: '+d+')');return false}
  saveSess(null);return true}
 function accountCard(){const x=A.session;
  if(!x)return SB.live?`<div class='card'><b>Du bist nicht angemeldet</b><div class='sub' style='margin:6px 0 10px'>Melde dich an, damit dein Konto und Premium gesichert sind.</div><button class='btn' onclick="view='login';render()">Anmelden</button></div>`:'';
@@ -2050,7 +2050,7 @@ function themeSet(t){lsSet('padel_theme',t);themeApply();render()}
 try{matchMedia('(prefers-color-scheme: dark)').addEventListener('change',()=>{if(themeGet()=='auto')themeApply()})}catch(e){}
 function themeCard(){const t=themeGet(),b=(k,l)=>`<button type="button" class="${t==k?'on':''}" onclick="themeSet('${k}')">${l}</button>`;return `<div class="card"><h3>🌓 Darstellung</h3><div class="thm">${b('auto','Automatisch')}${b('light','☀️ Hell')}${b('dark','🌙 Dunkel')}</div><div class="sub" style="margin-top:6px">„Automatisch“ folgt der Einstellung deines iPhones.</div></div>`}
 /* ===== Automatische Aktualisierung (nur Website-Version): neue Version erkennen und neu laden ===== */
-const APP_VERSION='20261029-173249';
+const APP_VERSION='20261029-175447';
 async function updCheck(){if(NATIVE||!SB.live||APP_VERSION=='dev'||document.hidden)return;
  try{const r=await fetch('version.json?ts='+Date.now(),{cache:'no-store'});if(!r.ok)return;const v=(await r.json()).v;if(!v||v==APP_VERSION)return;
   let tried=null;try{tried=sessionStorage.getItem('padel_upd')}catch(e){}if(tried==v)return;
