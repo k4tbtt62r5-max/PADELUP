@@ -71,7 +71,7 @@ h3{margin:0 0 8px;font-size:16px}
 .sheet{background:var(--bg);width:100%;max-width:560px;max-height:88vh;overflow:auto;border-radius:26px 26px 0 0;padding:18px 14px 28px}
 .center{text-align:center}
 .pill{display:inline-block;background:var(--lime);color:var(--lt);border-radius:20px;padding:3px 10px;font-weight:800;font-size:12px}
-#nav{position:fixed;left:0;right:0;bottom:0;margin:0 auto;max-width:560px;border-radius:18px 18px 0 0;padding:6px 6px calc(6px + env(safe-area-inset-bottom,0px));box-shadow:0 -4px 16px rgba(14,27,61,.12);z-index:10;overflow:visible;background:var(--card)}
+#nav{position:fixed;left:0;right:0;bottom:0;-webkit-transform:translateZ(0);will-change:transform;margin:0 auto;max-width:560px;border-radius:18px 18px 0 0;padding:6px 6px calc(6px + env(safe-area-inset-bottom,0px));box-shadow:0 -4px 16px rgba(14,27,61,.12);z-index:10;overflow:visible;background:var(--card)}
 #nav button .nb{position:absolute;top:3px;left:calc(50% + 6px);min-width:17px;height:17px;padding:0 4px;border-radius:9px;background:var(--rd);color:#fff;font-size:10px;font-weight:800;line-height:17px;font-style:normal}
 .qrbox{background:#fff;border-radius:14px;padding:10px;display:inline-block;line-height:0}.qrbox svg{display:block}
 #nav button{position:relative;flex:1;min-height:56px;padding:6px 2px;font-size:11px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;border-radius:12px;background:none;color:var(--mu)}
@@ -108,6 +108,7 @@ body.ad-on .toast{bottom:calc(var(--navh,72px) + var(--adh,50px) + 36px)}
 .legal .box{background:var(--tint);border-radius:12px;padding:10px 12px}
 .todo{display:inline;background:var(--card)3cd;color:#6b4a00;border-radius:6px;padding:1px 6px;font-size:13px;font-weight:600}
 .lnav{display:flex;gap:8px;flex-wrap:wrap}.lnav button{flex:1 1 auto;padding:10px 6px;border:1px solid var(--br);background:var(--card);border-radius:12px;font-weight:700;font-size:13px;color:var(--tx)}
+body.kb #nav,body.kb #res .rgo{visibility:hidden}
 body.gated .hero .chip,body.gated #hsc,body.gated #protohint,body.gated #tabs,body.gated #nav{display:none!important}
 body.gated .hero{padding-bottom:22px}body.gated .wrap{margin-top:16px}
 .feat{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin:12px 0 4px}.feat span{background:var(--tint);color:#1f4fff;border-radius:999px;padding:5px 10px;font-size:12px;font-weight:700}
@@ -1417,6 +1418,17 @@ async function errReport(m,src,stack){try{if(!SB.live)return;m=String(m||'').sli
  await sbFetch('/rest/v1/rpc/report_client_error',{method:'POST',token:t||undefined,body:{p_message:m,p_source:src?String(src).slice(0,200):null,p_stack:stack?String(stack).slice(0,2000):null,p_view:String(typeof view!='undefined'?view:''),p_version:String(typeof APP_VERSION!='undefined'?APP_VERSION:''),p_device:errDevice()},timeout:15000})}catch(e){}}
 try{window.addEventListener('error',e=>{if(!e||!e.message||/^Script error\.?$/.test(e.message))return;errReport(e.message,(e.filename||'').split('/').pop()+':'+(e.lineno||0)+':'+(e.colno||0),e.error&&e.error.stack)});
  window.addEventListener('unhandledrejection',e=>{const r=e&&e.reason;errReport('Unbehandelt: '+((r&&r.message)||String(r)),'promise',r&&r.stack)})}catch(e){}
+/* ===== Untere Leiste auf iPhone/iPad stabil halten =====
+   iOS-Safari verschiebt feste Elemente manchmal (nach der Tastatur, beim Größenändern des Fensters).
+   Lösung: Leiste an den sichtbaren Bereich anheften und während der Eingabe ausblenden. */
+function kbOpen(){const a=document.activeElement;return !!(a&&/^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName)&&!/^(checkbox|radio|file|button|submit)$/i.test(a.type||''))}
+function navFix(){try{const n=document.getElementById('nav'),vv=window.visualViewport;if(!n)return;document.body.classList.toggle('kb',kbOpen()&&!!vv&&vv.height<window.innerHeight*0.85);
+ if(!vv){n.style.transform='translateZ(0)';return}const off=Math.round(window.innerHeight-vv.height-vv.offsetTop);
+ n.style.transform=(!kbOpen()&&off>1&&off<window.innerHeight*0.5)?`translate3d(0,${-off}px,0)`:'translateZ(0)'}catch(e){}}
+try{if(window.visualViewport){visualViewport.addEventListener('resize',navFix);visualViewport.addEventListener('scroll',navFix)}
+ window.addEventListener('resize',navFix);window.addEventListener('orientationchange',()=>setTimeout(navFix,300));
+ document.addEventListener('focusin',()=>setTimeout(navFix,50));document.addEventListener('focusout',()=>setTimeout(()=>{navFix();try{window.scrollTo(window.scrollX,window.scrollY)}catch(e){}},120));
+ window.addEventListener('pageshow',()=>setTimeout(navFix,50))}catch(e){}
 /* ===== Einladen per Link und QR-Code ===== */
 const APP_URL='https://k4tbtt62r5-max.github.io/PADELUP/app/';
 function joinUrl(c){return APP_URL+'#join='+encodeURIComponent(c)}
@@ -2117,7 +2129,7 @@ function themeSet(t){lsSet('padel_theme',t);themeApply();render()}
 try{matchMedia('(prefers-color-scheme: dark)').addEventListener('change',()=>{if(themeGet()=='auto')themeApply()})}catch(e){}
 function themeCard(){const t=themeGet(),b=(k,l)=>`<button type="button" class="${t==k?'on':''}" onclick="themeSet('${k}')">${l}</button>`;return `<div class="card"><h3>🌓 Darstellung</h3><div class="thm">${b('auto','Automatisch')}${b('light','☀️ Hell')}${b('dark','🌙 Dunkel')}</div><div class="sub" style="margin-top:6px">„Automatisch“ folgt der Einstellung deines iPhones.</div></div>`}
 /* ===== Automatische Aktualisierung (nur Website-Version): neue Version erkennen und neu laden ===== */
-const APP_VERSION='20261030-073347';
+const APP_VERSION='20261030-080445';
 async function updCheck(){if(NATIVE||!SB.live||APP_VERSION=='dev'||document.hidden)return;
  try{const r=await fetch('version.json?ts='+Date.now(),{cache:'no-store'});if(!r.ok)return;const v=(await r.json()).v;if(!v||v==APP_VERSION)return;
   let tried=null;try{tried=sessionStorage.getItem('padel_upd')}catch(e){}if(tried==v)return;
