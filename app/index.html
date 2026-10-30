@@ -125,9 +125,14 @@ body.gated .hero{padding-bottom:22px}body.gated .wrap{margin-top:16px}
 .rset .n{font-size:11px;color:var(--mu);font-weight:700}.rset .sc{display:flex;justify-content:center;align-items:center;gap:2px;margin-top:2px}
 .rset select{width:44px;padding:2px 0;margin:0;border:0;background:transparent;font-size:24px;font-weight:900;text-align:center;text-align-last:center;-webkit-appearance:none;appearance:none;color:var(--tx)}.rset select.w{color:#4d6b00}.rset .d{color:#c3cbe0;font-weight:900}
 .rset.add{display:grid;place-items:center;color:var(--mu);font-weight:800;cursor:pointer;background:none;font-size:15px}
-.rph{display:grid;grid-template-columns:86px minmax(0,1fr);gap:12px;align-items:center;margin-top:10px}.rph .tile{height:86px;border-radius:16px;background:repeating-linear-gradient(45deg,var(--tint),var(--tint) 8px,#e4ebff 8px,#e4ebff 16px);border:2px dashed #b9c8ff;display:grid;place-items:center;font-size:28px;overflow:hidden;cursor:pointer}.rph .tile img{width:100%;height:100%;object-fit:cover}
+.rph{display:grid;grid-template-columns:86px minmax(0,1fr);gap:12px;align-items:center;margin-top:10px}.rph .tile{height:86px;border-radius:16px;background:var(--tint);border:1.5px solid #c9d6ff;box-shadow:inset 0 0 0 4px var(--card);display:grid;place-items:center;font-size:28px;overflow:hidden;cursor:pointer}.rph .tile img{width:100%;height:100%;object-fit:cover}
 .rph p{margin:3px 0 0;font-size:12.5px;color:var(--mu);line-height:1.4}.rph .chip{display:inline-block;margin-top:8px;background:var(--tint);color:var(--blt);font-size:12px;font-weight:800;border-radius:999px;padding:5px 11px;border:0;cursor:pointer}
-.rpts{display:grid;grid-template-columns:1fr 1fr;gap:8px}.rpt{border-radius:14px;padding:10px 12px;min-width:0}.rpt.w{background:#0e1b3d;color:#fff}.rpt.l{background:var(--soft)}.rpt .big{font-size:22px;font-weight:900}.rpt.w .big{color:var(--lime)}.rpt small{font-size:12px;opacity:.85;display:block}
+.rpts{display:grid;grid-template-columns:1fr 1fr;gap:8px}.rpt{border-radius:14px;padding:10px 12px;min-width:0}.rpt.w{background:linear-gradient(160deg,#f5ffd6,#e6fbaa);color:#2b3a05;border:2px solid var(--lime)}.rpt.l{background:var(--soft)}.rpt .big{font-size:22px;font-weight:900}.rpt.w .big{color:#4d6b00}.rpt.l{border:2px solid var(--br)}.rpt small{font-size:12px;opacity:.85;display:block}
+.camico{position:relative;width:46px;height:46px;border-radius:50%;background:var(--card);display:grid;place-items:center;color:var(--bl);box-shadow:0 2px 8px rgba(31,79,255,.15)}.camico svg{width:26px;height:26px}.camico b{position:absolute;right:-4px;bottom:-4px;width:20px;height:20px;border-radius:50%;background:var(--lime);color:#0e1b3d;font-size:15px;line-height:20px;text-align:center;font-weight:900;border:2px solid var(--card)}
+html[data-theme=dark] .camico{color:var(--blt)}
+#nav button i{font-style:normal;display:grid;place-items:center;height:26px}#nav button i svg{width:24px;height:24px}
+#nav button.cta i{width:40px;height:40px;border-radius:50%;background:var(--lime);color:#0e1b3d;margin-top:-4px;box-shadow:0 4px 12px rgba(150,190,0,.45)}#nav button.cta i svg{width:22px;height:22px}
+svg.ic{width:16px;height:16px;vertical-align:-3px;margin-right:4px}.rft .th svg.ic{width:14px;height:14px;vertical-align:-2px;margin-right:3px}
 .rnote{display:flex;gap:8px;font-size:12.5px;color:var(--mu);line-height:1.45;margin-top:12px}
 .rgo{position:sticky;bottom:calc(86px + env(safe-area-inset-bottom,0px));z-index:5;font-size:17px;padding:16px;border-radius:18px;box-shadow:0 10px 24px rgba(120,160,0,.35);margin-top:16px}
 .pick{max-height:52vh;overflow:auto;margin:6px -4px 0;padding:0 4px}.pick .row.off{opacity:.4;pointer-events:none}.pick h4{margin:12px 0 4px;font-size:12px;letter-spacing:.5px;text-transform:uppercase;color:var(--mu)}
@@ -157,13 +162,13 @@ html[data-theme=dark] .todo{background:#3d3214;color:#ffd97a}
 html[data-theme=dark] .rft.win{background:linear-gradient(160deg,#1f2d10,#26380f);border-color:#7fa30f}
 html[data-theme=dark] .rft.win .th{color:#c8f31d}
 html[data-theme=dark] .rset select.w{color:#c8f31d}
-html[data-theme=dark] .rpt.w{background:#0a1124;border:1px solid var(--br)}
+html[data-theme=dark] .rpt.w{background:linear-gradient(160deg,#1f2d10,#26380f);border-color:#7fa30f;color:var(--tx)}html[data-theme=dark] .rpt.w .big{color:#c8f31d}
 html[data-theme=dark] .rvs span{background:#c8f31d;color:#0b1020}
 html[data-theme=dark] .ovt{background:linear-gradient(135deg,#3a1d1a,#3a1424);border-color:#7a3a33}
 html[data-theme=dark] .modal{background:rgba(0,0,0,.65)}
 html[data-theme=dark] .apple{background:#fff;color:#000}html[data-theme=dark] .apple svg{fill:#000}
 html[data-theme=dark] .h2h .bar{background:#4a2026}
-html[data-theme=dark] .rph .tile{background:repeating-linear-gradient(45deg,#1b2338,#1b2338 8px,#202a44 8px,#202a44 16px);border-color:#3a4a78}
+html[data-theme=dark] .rph .tile{background:#1b2338;border-color:#3a4a78}
 html[data-theme=dark] img.ph,html[data-theme=dark] .alb img{filter:brightness(.92)}
 .thm{display:flex;background:var(--soft);border-radius:12px;padding:4px;gap:4px}.thm button{flex:1;border:0;background:transparent;padding:9px 4px;border-radius:9px;font-weight:800;font-size:13px;color:var(--mu)}.thm button.on{background:var(--card);color:var(--blt);box-shadow:0 1px 4px rgba(0,0,0,.15)}
 html[data-theme=dark] .thm button.on{color:#9fb6ff}
@@ -176,11 +181,11 @@ html[data-theme=dark] .btn.ghost{background:var(--card)}
 <div class="wrap">
   <div class="tabs" id="tabs"></div>
   <div class="nav" id="nav">
-    <button data-v="rank" class="on"><i>🏆</i>Rangliste</button>
-    <button data-v="feed"><i>📸</i>Matches</button>
-    <button data-v="res" class="cta"><i>➕</i>Ergebnis</button>
-    <button data-v="season"><i>🏁</i>Saison</button>
-    <button data-v="more"><i>☰</i>Mehr</button>
+    <button data-v="rank" class="on"><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 4h8v5a4 4 0 0 1-8 0z"/><path d="M8 6H5.5a2.5 2.5 0 0 0 2.6 4"/><path d="M16 6h2.5a2.5 2.5 0 0 1-2.6 4"/><path d="M12 13v3"/><path d="M8.5 20h7l-.8-4h-5.4z"/></svg></i>Rangliste</button>
+    <button data-v="feed"><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="3"/><circle cx="9" cy="10" r="1.6"/><path d="M21 16l-5-5-8 8"/></svg></i>Matches</button>
+    <button data-v="res" class="cta"><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></i>Ergebnis</button>
+    <button data-v="season"><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 21V4"/><path d="M5 4h12l-2.5 4L17 12H5"/></svg></i>Saison</button>
+    <button data-v="more"><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg></i>Mehr</button>
   </div>
   <div id="rank"></div>
   <div id="feed" class="hide"></div>
@@ -237,8 +242,8 @@ html[data-theme=dark] .btn.ghost{background:var(--card)}
       <div class="lbl">Ergebnis <i>optional</i></div>
       <div class="rsets" id="rfsets"></div><div class="sub" id="rfscerr" style="color:#c0262d;margin-top:6px"></div>
       <div class="lbl">Foto <i>optional</i></div>
-      <div class="seg2" id="rfpk"><button type="button" data-k="win" class="on" onclick="rfKind('win')">🏆 Siegerfoto</button><button type="button" data-k="match" onclick="rfKind('match')">👥 Matchfoto</button></div>
-      <div class="rph"><div class="tile" id="rftile" onclick="rfPickPhoto()">📸</div><div><b id="rfphh">Foto vom Siegerteam</b><p id="rfpht">Erscheint groß mit „Sieger“-Abzeichen im Matches-Feed.</p><button type="button" class="chip" id="rfphb" onclick="rfPickPhoto()">Foto auswählen</button></div></div>
+      <div class="seg2" id="rfpk"><button type="button" data-k="win" class="on" onclick="rfKind('win')"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 4h8v5a4 4 0 0 1-8 0z"/><path d="M12 13v3"/><path d="M8.5 20h7l-.8-4h-5.4z"/></svg>Siegerfoto</button><button type="button" data-k="match" onclick="rfKind('match')"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3"/><path d="M3 20a6 6 0 0 1 12 0"/><circle cx="17" cy="9" r="2.4"/><path d="M15.5 14.2A5 5 0 0 1 21 19"/></svg>Matchfoto</button></div>
+      <div class="rph"><div class="tile" id="rftile" onclick="rfPickPhoto()"><span class="camico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8h3l1.8-2.6h6.4L17 8h3a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1z"/><circle cx="12" cy="13.2" r="3.4"/></svg><b>+</b></span></div><div><b id="rfphh">Foto vom Siegerteam</b><p id="rfpht">Erscheint groß mit „Sieger“-Abzeichen im Matches-Feed.</p><button type="button" class="chip" id="rfphb" onclick="rfPickPhoto()">Foto auswählen</button></div></div>
       <div class="sub" id="phnote" style="margin-top:6px"></div>
       <label class="chk"><input type="checkbox" id="phc"><span id="phct">Alle Personen auf dem Foto sind mit der Veröffentlichung einverstanden.</span></label>
       <div class="lbl">Das bringt das Spiel</div>
@@ -1451,6 +1456,7 @@ async function posterShare(){try{const b=await (await fetch(window._pst)).blob()
  const SH=window.Capacitor&&Capacitor.Plugins&&Capacitor.Plugins.Share;if(SH&&SH.share){await SH.share({title:'PADELUP-Aushang',url:window._pst});return}
  msg('Teilen wird hier nicht unterstützt. Nutze „Als Bild herunterladen“ oder halte das Bild gedrückt.')}catch(e){if(e&&e.name!='AbortError')msg('Teilen hat nicht geklappt. Nutze „Als Bild herunterladen“.')}}
 /* ===== Ergebnis direkt entfernen (Hallen-Admins und Betreiber, Server: Migration 014) ===== */
+const CAM_ICO='<span class="camico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8h3l1.8-2.6h6.4L17 8h3a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1z"/><circle cx="12" cy="13.2" r="3.4"/></svg><b>+</b></span>',TR_ICO='<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 4h8v5a4 4 0 0 1-8 0z"/><path d="M12 13v3"/><path d="M8.5 20h7l-.8-4h-5.4z"/></svg>';
 const RMV_WHY=['Testspiel','Falsches Ergebnis','Doppelt eingetragen','Verstoß gegen die Nutzungsbedingungen'];
 function canMod(){return isR()&&!!(RM.owner||(curHall()&&curHall().role=='admin'))}
 function admRemove(id){const m=S.matches.find(x=>x.id==id);if(!m)return;window._rmv=id;
@@ -1970,7 +1976,7 @@ function rfSlot(side,i){const p=rfP(RF[side][i]),me=S.me&&S.me.pid;
   :`<button type="button" class="rpl add" onclick="rfPick('${side}',${i})">+ Spieler wählen</button>`}
 function rfRender(){if(!document.getElementById('rfteams'))return;rfInit();rfSync();const dbl=rfDbl(),n=dbl?2:1,sl=s=>[...Array(n).keys()].map(i=>rfSlot(s,i)).join('');
  document.getElementById('reslg').textContent=(curHall()?curHall().name:'')+' · Saison '+sno(S.season);
- document.getElementById('rfteams').innerHTML=`<div class="rft win"><div class="th">🏆 Gewinner</div>${sl('w')}</div><div class="rvs"><span>VS</span></div><div class="rft lose"><div class="th">Verlierer</div>${sl('l')}</div>`;
+ document.getElementById('rfteams').innerHTML=`<div class="rft win"><div class="th">${TR_ICO}Gewinner</div>${sl('w')}</div><div class="rvs"><span>VS</span></div><div class="rft lose"><div class="th">Verlierer</div>${sl('l')}</div>`;
  const opt=(v,c)=>`<option value="">–</option>`+[0,1,2,3,4,5,6,7].map(k=>`<option ${v===k?'selected':''}>${k}</option>`).join('');
  document.getElementById('rfsets').innerHTML=RF.sets.map((x,i)=>i<RF.n?`<div class="rset${x[0]!=null&&x[1]!=null&&!setOk(x[0],x[1])?' bad':''}"><div class="n">Satz ${i+1}</div><div class="sc"><select class="w" aria-label="Satz ${i+1} Gewinner" onchange="rfSet(${i},0,this.value)">${opt(x[0])}</select><span class="d">:</span><select aria-label="Satz ${i+1} Verlierer" onchange="rfSet(${i},1,this.value)">${opt(x[1])}</select></div></div>`:(i==RF.n?`<button type="button" class="rset add" onclick="RF.n++;rfRender()">+ Satz</button>`:'<div></div>')).join('');
  document.getElementById('rfscerr').textContent=scoreErr(document.getElementById('sc').value);
@@ -1987,7 +1993,7 @@ function rfKind(k){if(RF.pk==k)return;const from=document.getElementById(RF.pk==
  try{if(from.files&&from.files.length){const dt=new DataTransfer();dt.items.add(from.files[0]);to.files=dt.files;from.value=''}}catch(e){from.value=''}rfRender()}
 function rfPickPhoto(){if(!photoOk())return;document.getElementById(RF.pk=='win'?'ph':'ph2').click()}
 function rfPhoto(quiet){const f=(document.getElementById(RF.pk=='win'?'ph':'ph2').files||[])[0],t=document.getElementById('rftile'),b=document.getElementById('rfphb');if(!t)return;
- if(!f){t.innerHTML='📸';b.textContent='Foto auswählen';return}b.textContent='Anderes Foto';if(t.dataset.f==f.name+f.size&&t.querySelector('img'))return;t.dataset.f=f.name+f.size;
+ if(!f){t.innerHTML=CAM_ICO;b.textContent='Foto auswählen';return}b.textContent='Anderes Foto';if(t.dataset.f==f.name+f.size&&t.querySelector('img'))return;t.dataset.f=f.name+f.size;
  try{const u=URL.createObjectURL(f);t.innerHTML=`<img src="${u}" alt="">`}catch(e){t.textContent='✅'}}
 function rfPick(side,i){const me=S.me&&S.me.pid,taken=[...RF.w,...RF.l].filter((x,k)=>x!=null&&!(['w','l'][Math.floor(k/2)]==side&&k%2==i));
  const recent=[];S.matches.slice().reverse().forEach(m=>{if(m.hall==S.hall&&me!=null&&inM(m,me))[...W(m),...L(m)].forEach(id=>{if(id!=me&&!recent.includes(id)&&rfP(id))recent.push(id)})});
@@ -2090,7 +2096,7 @@ function themeSet(t){lsSet('padel_theme',t);themeApply();render()}
 try{matchMedia('(prefers-color-scheme: dark)').addEventListener('change',()=>{if(themeGet()=='auto')themeApply()})}catch(e){}
 function themeCard(){const t=themeGet(),b=(k,l)=>`<button type="button" class="${t==k?'on':''}" onclick="themeSet('${k}')">${l}</button>`;return `<div class="card"><h3>🌓 Darstellung</h3><div class="thm">${b('auto','Automatisch')}${b('light','☀️ Hell')}${b('dark','🌙 Dunkel')}</div><div class="sub" style="margin-top:6px">„Automatisch“ folgt der Einstellung deines iPhones.</div></div>`}
 /* ===== Automatische Aktualisierung (nur Website-Version): neue Version erkennen und neu laden ===== */
-const APP_VERSION='20261029-182011';
+const APP_VERSION='20261030-070741';
 async function updCheck(){if(NATIVE||!SB.live||APP_VERSION=='dev'||document.hidden)return;
  try{const r=await fetch('version.json?ts='+Date.now(),{cache:'no-store'});if(!r.ok)return;const v=(await r.json()).v;if(!v||v==APP_VERSION)return;
   let tried=null;try{tried=sessionStorage.getItem('padel_upd')}catch(e){}if(tried==v)return;
