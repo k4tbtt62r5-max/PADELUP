@@ -228,7 +228,7 @@ html[data-theme=dark] .btn.ghost{background:var(--card)}
     </div>
     <div class="card"><h3>Beispiel</h3><div class="sub" style="font-size:14px;color:var(--tx)">Lena (Rookie) schlägt Tim (Smash) 6:3 6:4:<br><b>Lena +4 Punkte</b>, <b>Tim +1 Punkt</b>.</div></div>
     <div id="wlinfo"></div><div class="card"><h3>Rangfolge</h3><div class="sub" style="font-size:14px;color:var(--tx)">1. Meiste Punkte<br>2. Bei Gleichstand: mehr Siege<br>3. Danach alphabetisch</div></div>
-    <div class="card"><h3>Ligen</h3><div class="sub" style="font-size:14px;color:var(--tx)"><b>Rookie</b> · Level 0–1,5<br><b>Smash</b> · Level 1,5–2,7<br><b>Elite</b> · Level 2,7–4<br>Jede Liga hat ihre eigene Rangliste. Gespielt werden darf auch gegen andere Ligen.</div></div>
+    <div class="card"><h3>Ligen</h3><div class="sub" style="font-size:14px;color:var(--tx)"><b>Rookie</b> · Level 0–1,5<br><b>Smash</b> · Level 1,5–2,7<br><b>Elite</b> · Level 2,7–∞<br>Jede Liga hat ihre eigene Rangliste. Gespielt werden darf auch gegen andere Ligen.</div></div>
     <div class="card"><h3>Dein Level</h3><div class="sub" style="font-size:14px;color:var(--tx);line-height:1.6">Du trägst dein <b>Playtomic-Level</b> selbst ein.<br><b>Während der Saison</b> bleibt deine Liga gleich, sobald du dein erstes Spiel eingetragen hast.<br><b>Zur neuen Saison</b> fragt dich die App einmal, ob dein Level noch stimmt.<br><b>Wechsel in eine niedrigere Liga</b> gibt der Hallen-Admin frei.<br><span style="font-size:12px;color:var(--mu)">PADELUP ist eine eigenständige App und steht in keiner Verbindung zu Playtomic.</span></div></div>
     <div class="card"><h3>Form-Punkte</h3><div class="sub" style="font-size:14px;color:var(--tx)"><span class="dots"><i></i><i></i><i class="l"></i></span> Grün = Sieg, Rot = Niederlage (die letzten 5 Matches).<br>Das Siegerfoto gibt keine Extrapunkte, es ist nur zum Feiern. 📸</div></div>
   </div>
@@ -279,7 +279,7 @@ html[data-theme=dark] .btn.ghost{background:var(--card)}
 const LEAGUES=[
   {id:"rookie",name:"Rookie",range:"Level 0–1,5"},
   {id:"smash",name:"Smash",range:"Level 1,5–2,7"},
-  {id:"elite",name:"Elite",range:"Level 2,7–4"}
+  {id:"elite",name:"Elite",range:"Level 2,7–∞"}
 ];
 const COL=["#1f4fff","#00b894","#e17055","#6c5ce7","#e84393","#0984e3","#d6a100"];
 function seed0(){return{players:[["Lena","rookie"],["Tim","rookie"],["Mara","smash"],["Jonas","smash"],["Sofia","smash"],["Marco","elite"],["Nils","elite"],["Clara","elite"]].map((p,i)=>({id:i+1,name:p[0],league:p[1],pts:0,w:0,l:0,h:[],img:null})),matches:[]}}
@@ -2193,7 +2193,7 @@ function themeSet(t){lsSet('padel_theme',t);themeApply();render()}
 try{matchMedia('(prefers-color-scheme: dark)').addEventListener('change',()=>{if(themeGet()=='auto')themeApply()})}catch(e){}
 function themeCard(){const t=themeGet(),b=(k,l)=>`<button type="button" class="${t==k?'on':''}" onclick="themeSet('${k}')">${l}</button>`;return `<div class="card"><h3>🌓 Darstellung</h3><div class="thm">${b('auto','Automatisch')}${b('light','☀️ Hell')}${b('dark','🌙 Dunkel')}</div><div class="sub" style="margin-top:6px">„Automatisch“ folgt der Einstellung deines iPhones.</div></div>`}
 /* ===== Automatische Aktualisierung (nur Website-Version): neue Version erkennen und neu laden ===== */
-const APP_VERSION='20261102-121706';
+const APP_VERSION='20261102-125802';
 async function updCheck(){if(NATIVE||!SB.live||APP_VERSION=='dev'||document.hidden)return;
  try{const r=await fetch('version.json?ts='+Date.now(),{cache:'no-store'});if(!r.ok)return;const v=(await r.json()).v;if(!v||v==APP_VERSION)return;
   let tried=null;try{tried=sessionStorage.getItem('padel_upd')}catch(e){}if(tried==v)return;
