@@ -323,7 +323,7 @@ function qr(p){const g=(p.w||0)+(p.l||0);return g?p.w/g:-1}
 function cmp(a,b){return b.pts-a.pts||g6(b)-g6(a)||qr(b)-qr(a)||(a.pa||0)-(b.pa||0)||a.name.localeCompare(b.name)}
 function pq(p){const g=(p.w||0)+(p.l||0);return g?Math.round(p.w/g*100)+' %':'–'}
 function tieTag(p,lst){if(!p.pts||!lst.some(x=>x.id!=p.id&&x.pts==p.pts))return '';return ` · <span class="tq">⚖️ ${g6(p)?pq(p)+' Siege':'unter 6 Spielen'}</span>`}
-function tieWhy(p,t){if(g6(t)&&!g6(p)){const f=6-p.w-p.l;return `wer mindestens 6 Spiele hat, steht vorne – dir ${f==1?'fehlt noch 1 Spiel':'fehlen noch '+f+' Spiele'}`}
+function tieWhy(p,t){if(!t.pts)return 'dein erstes Spiel bringt dich nach vorne';if(g6(t)&&!g6(p)){const f=6-p.w-p.l;return `wer mindestens 6 Spiele hat, steht vorne – dir ${f==1?'fehlt noch 1 Spiel':'fehlen noch '+f+' Spiele'}`}
  if(qr(t)!=qr(p))return `${esc(t.name)} hat die bessere Siegquote: <b>${pq(t)}</b> zu deinen <b>${pq(p)}</b>. Ein Sieg bringt dich näher`;
  return `${esc(t.name)} hat die Punktzahl früher erreicht`}
 /* Platzierung vor 24 Stunden: aktuelle Punkte minus Spiele der letzten 24 Stunden */
@@ -522,7 +522,7 @@ function saveProfile(){if(isR())return rSaveProfile();
  if(!p&&!(document.getElementById('tos').checked&&document.getElementById('age').checked)){msg('Bitte bestätige die Nutzungsbedingungen, die Datenschutzerklärung und dass du mindestens 16 Jahre alt bist.');return}
  const hh=p?p.hall:S.hall;
  S.me.name=n;S.me.email=em;
- if(!p){S.consent={ts:Date.now(),v:'28. Oktober 2026'};const lv=clampLv(lvIn);p={id:Date.now(),name:n,league:leagueOf(lv),hall:S.hall,lv,pts:0,w:0,l:0,h:[],img:null,cs:S.season.id};S.players.push(p);ensureLv();S.me.pid=p.id}
+ if(!p){S.consent={ts:Date.now(),v:TERMS_V};const lv=clampLv(lvIn);p={id:Date.now(),name:n,league:leagueOf(lv),hall:S.hall,lv,pts:0,w:0,l:0,h:[],img:null,cs:S.season.id};S.players.push(p);ensureLv();S.me.pid=p.id}
  else{p.name=n;if(ok){p.lv=clampLv(lvIn);if(!playedNow(p))p.league=leagueOf(p.lv);p.cs=S.season.id}S.matches.forEach(m=>{if(m.wid==p.id)m.w=n;if(m.lid==p.id)m.l=n;if(m.wid2==p.id)m.w2=n;if(m.lid2==p.id)m.l2=n})}
  S.hall=p.hall;cur=p.league;save();view='rank';render();toast('Gespeichert. Das ist deine Rangliste.');
 }
@@ -1800,7 +1800,7 @@ function setAdUi(){const web=AD.demo&&!NATIVE&&wantBanner(),vis=!!((NATIVE&&AD.v
  if(document.documentElement)document.documentElement.style.setProperty('--adh',(vis?(web?50:(AD.adh||50)):0)+'px');
  if(document.body)document.body.classList.toggle('ad-on',vis);
  document.getElementById('adbar').classList.toggle('hide',!vis);document.getElementById('demobanner').classList.toggle('hide',!web)}
-function afterRender(){document.body.classList.toggle('gated',SB.live&&!A.session);navBadge();try{meBar()}catch(e){}injectFeedAds();syncBanner()}
+function afterRender(){setTimeout(termsPrompt,0);document.body.classList.toggle('gated',SB.live&&!A.session);navBadge();try{meBar()}catch(e){}injectFeedAds();syncBanner()}
 async function loadAds(){if(AD.demo&&!NATIVE){AD.camps=DEMO_CAMPS.slice();return}
  if(!SB.live||!A.session){AD.camps=[];return}const t=await freshToken();if(!t)return;
  const r=await sbFetch('/rest/v1/ad_campaigns?select=id,advertiser,headline,body,image_url,cta_label,cta_url&order=created_at.desc&limit=10',{token:t});
@@ -1852,7 +1852,7 @@ async function signUrls(paths){paths=[...new Set(paths.filter(Boolean))];if(!pat
  if(r.ok&&Array.isArray(r.json))r.json.forEach(x=>{if(x&&x.signedURL&&!x.error)out[x.path]=(/^https?:/.test(x.signedURL)?'':SB.url+'/storage/v1')+x.signedURL});return out}catch(e){return{}}}
 function remoteLoad(){if(!isR())return Promise.resolve();if(RM.busy)return RM.busy;RM.busy=(async()=>{try{
  const uid=A.session.user.id;
- const [prof,mem,halls,blocks]=await Promise.all([rq(`/rest/v1/profiles?id=eq.${qid(uid)}&select=id,display_name,avatar_path,show_premium`),rq(`/rest/v1/hall_members?user_id=eq.${qid(uid)}&select=hall_id,role,level,league`),rq('/rest/v1/halls?select=id,name,join_code&order=created_at'),rq('/rest/v1/blocks?select=blocked_id')]);
+ const [prof,mem,halls,blocks]=await Promise.all([rq(`/rest/v1/profiles?id=eq.${qid(uid)}&select=id,display_name,avatar_path,show_premium,terms_version`).catch(()=>rq(`/rest/v1/profiles?id=eq.${qid(uid)}&select=id,display_name,avatar_path,show_premium`)),rq(`/rest/v1/hall_members?user_id=eq.${qid(uid)}&select=hall_id,role,level,league`),rq('/rest/v1/halls?select=id,name,join_code&order=created_at'),rq('/rest/v1/blocks?select=blocked_id')]);
  RM.profile=prof[0]||null;const myIds=mem.map(m=>m.hall_id),hs=halls.filter(h=>myIds.includes(h.id));
  RM.hall=hs.some(h=>h.id==RM.hall)?RM.hall:(hs[0]?hs[0].id:null);lsSet('padel_rhall',RM.hall);
  let rank=[],seas=[],ms=[],st=[],lk=[];
@@ -1931,7 +1931,7 @@ function rSaveProfile(){const n=document.getElementById('mn').value.trim(),raw=S
  if(isNew&&!ok){msg('Bitte gib dein Playtomic-Level ein, damit wir deine Liga bestimmen können.');return}
  if(isNew&&!(document.getElementById('tos')&&document.getElementById('tos').checked&&document.getElementById('age')&&document.getElementById('age').checked)){msg('Bitte bestätige die Nutzungsbedingungen, die Datenschutzerklärung und dass du mindestens 16 Jahre alt bist.');return}
  if(ok)S.me.lv=Math.round(lv*100)/100;
- rRun(async()=>{if(isNew)await rq('/rest/v1/profiles',{method:'POST',headers:{Prefer:'return=minimal'},body:{id:uid,display_name:n.slice(0,30),accepted_terms_at:new Date().toISOString()}});
+ rRun(async()=>{if(isNew)await rq('/rest/v1/profiles',{method:'POST',headers:{Prefer:'return=minimal'},body:{id:uid,display_name:n.slice(0,30),accepted_terms_at:new Date().toISOString()}});if(isNew){try{await rpc('accept_terms',{p_version:TERMS_V})}catch(e){}}
   else if(n!==RM.profile.display_name)await rq(`/rest/v1/profiles?id=eq.${qid(uid)}`,{method:'PATCH',headers:{Prefer:'return=minimal'},body:{display_name:n.slice(0,30)}});
   if(ok&&RM.hall&&mine()&&Math.abs(mine().lv-S.me.lv)>0.004)lvMsg(await rpc('set_my_level',{p_hall:RM.hall,p_level:S.me.lv}))},'Gespeichert',RM.hall?'rank':'halls')}
 /* ===== Push-Nachrichten (nur App aus dem Store, nur angemeldet) ===== */
@@ -2146,8 +2146,24 @@ function rfChoose(id){const k=RF.pick;if(!k||k.taken.includes(id))return;if(id==
 
 /* ===== Level pro Saison ===== */
 function lvMsg(r){if(r=='pending')msg('Dein neues Level würde dich in eine niedrigere Liga bringen. Der Hallen-Admin muss das kurz freigeben. Bis dahin bleibt dein bisheriges Level.');else if(r=='next_season')msg('Gespeichert. Weil du in dieser Saison schon gespielt hast, gilt deine neue Liga ab der nächsten Saison.')}
+
+const TERMS_V='2. November 2026';
+const TERMS_CH=[['👤','Gastspieler im Doppel','Wer keine App hat, kann als „Gast“ ohne Namen mitspielen. Solche Ergebnisse zählen nur, wenn ein Gegner bestätigt.'],['🎯','Beste 6','Pro Saison zählen deine 6 punktstärksten Spiele. Das Wochenlimit entfällt.'],['⚖️','Bei Gleichstand','Zuerst zählen mindestens 6 Spiele, dann die Siegquote, dann wer die Punktzahl zuerst erreicht hat.']];
+let TOS_OPEN=false;
+function needTerms(){if(isR())return !!(RM.ready&&RM.profile&&RM.profile.terms_version!==undefined&&RM.profile.terms_version!==TERMS_V);return !!(S.consent&&S.consent.v&&S.consent.v!==TERMS_V)}
+function termsPrompt(){if(!needTerms()||view=='login'||view=='legal'){return false}if(TOS_OPEN)return true;if(!document.getElementById('modal').classList.contains('hide'))return false;termsShow();return true}
+function termsShow(){TOS_OPEN=true;sheet(`<div class="center"><div style="font-size:40px">📄</div><h3 style="font-size:20px;margin:4px 0 2px">Neue Nutzungsbedingungen</h3><div class="sub">Stand: ${TERMS_V}</div></div>
+<div class="sub" style="font-size:14px;color:var(--tx);line-height:1.55;margin:12px 0 6px">Wir haben die Nutzungsbedingungen angepasst. Bitte lies kurz, was sich ändert:</div>`+TERMS_CH.map(([i,t,d])=>`<div class="row" style="cursor:default;align-items:flex-start"><span style="font-size:20px">${i}</span><div class="nm" style="font-size:14px">${t}<div class="sub">${d}</div></div></div>`).join('')+
+`<a href="#" id="tosread" style="display:block;text-align:center;color:var(--blt);font-weight:700;margin:12px 0" onclick="termsRead();return false">Nutzungsbedingungen ganz lesen</a><button class="btn lime" id="tosok" onclick="termsOk()">Zustimmen</button><button class="btn ghost" onclick="termsNo()">Nicht zustimmen</button>`)}
+function termsNo(){sheet(`<div class="center"><div style="font-size:40px">🤔</div><h3 style="font-size:20px;margin:4px 0">Ohne Zustimmung geht es nicht weiter</h3></div><div class="sub" style="font-size:14px;color:var(--tx);line-height:1.6;margin:10px 0 14px">Die neuen Regeln gelten für alle Spieler deiner Halle gleich. Ohne deine Zustimmung kannst du PADELUP deshalb nicht weiter nutzen.<br><br>Du kannst es dir in Ruhe überlegen – das Fenster kommt beim nächsten Öffnen wieder. Oder du löschst dein Konto, dann werden deine Daten entfernt.</div><button class="btn" onclick="termsShow()">Zurück</button><button class="btn ghost" style="color:#d63031" onclick="termsDel()">Konto löschen</button>`)}
+function termsRead(){TOS_OPEN=false;closeM();view='legal';render();setTimeout(()=>{try{legalGo('nutzungsbedingungen')}catch(e){}},50)}
+function termsDel(){TOS_OPEN=false;closeM();Promise.resolve(delAccount()).finally(()=>setTimeout(()=>{termsPrompt()},300))}
+async function termsOk(){const b=document.getElementById('tosok');if(b)b.disabled=true;
+ if(isR()){try{await rpc('accept_terms',{p_version:TERMS_V});RM.profile.terms_version=TERMS_V}catch(e){if(b)b.disabled=false;toast(e.message||'Speichern fehlgeschlagen – bitte erneut versuchen');return}}
+ else{S.consent={ts:Date.now(),v:TERMS_V};save()}
+ TOS_OPEN=false;closeM();toast('Danke! Viel Spaß beim Spielen')}
 let SP_SHOWN=false;
-function seasonPrompt(){if(SP_SHOWN||view=='login'||!document.getElementById('modal').classList.contains('hide'))return;
+function seasonPrompt(){if(termsPrompt())return;if(SP_SHOWN||view=='login'||!document.getElementById('modal').classList.contains('hide'))return;
  let st=null;if(isR()){if(!RM.ss||!RM.ss.needs_confirm)return;st=RM.ss}else{const p=mine();if(!p||p.cs==S.season.id)return;
   const last=S.history[0],r=last&&last.halls[p.hall]&&last.halls[p.hall][p.league];const i=r?r.findIndex(x=>x.id==p.id):-1;
   st={level:p.lv,league:p.league,season_no:S.season.id,locked:playedNow(p),last:i>=0?{rank:i+1,league:p.league,points:r[i].pts,season_no:last.id}:null}}
@@ -2234,7 +2250,7 @@ function themeSet(t){lsSet('padel_theme',t);themeApply();render()}
 try{matchMedia('(prefers-color-scheme: dark)').addEventListener('change',()=>{if(themeGet()=='auto')themeApply()})}catch(e){}
 function themeCard(){const t=themeGet(),b=(k,l)=>`<button type="button" class="${t==k?'on':''}" onclick="themeSet('${k}')">${l}</button>`;return `<div class="card"><h3>🌓 Darstellung</h3><div class="thm">${b('auto','Automatisch')}${b('light','☀️ Hell')}${b('dark','🌙 Dunkel')}</div><div class="sub" style="margin-top:6px">„Automatisch“ folgt der Einstellung deines iPhones.</div></div>`}
 /* ===== Automatische Aktualisierung (nur Website-Version): neue Version erkennen und neu laden ===== */
-const APP_VERSION='20261102-202311';
+const APP_VERSION='20261102-204937';
 async function updCheck(){if(NATIVE||!SB.live||APP_VERSION=='dev'||document.hidden)return;
  try{const r=await fetch('version.json?ts='+Date.now(),{cache:'no-store'});if(!r.ok)return;const v=(await r.json()).v;if(!v||v==APP_VERSION)return;
   let tried=null;try{tried=sessionStorage.getItem('padel_upd')}catch(e){}if(tried==v)return;
@@ -2255,7 +2271,7 @@ function renderPrem(){
   :`<div class='sub' style='font-size:15px;color:var(--tx)'><b>Premium ist noch nicht verfügbar.</b> Wir sagen Bescheid, sobald es losgeht.</div>`);
  document.getElementById('prem').innerHTML=`<div class='card'><h3>Premium ⭐ <span class='pill' style='background:var(--soft);color:var(--mu)'>${on?'Aktiv':(avail?'':'Bald')}</span></h3><div class='two'><div><b>Kostenlos</b><div class='sub' style='line-height:1.8'>✓ Rangliste<br>✓ Matches &amp; Siegerfotos<br>✓ Profil &amp; Likes<br>✓ Alle drei Ligen</div></div><div><b>Premium</b><div class='sub' style='line-height:1.8'>✓ Alles aus Kostenlos<br>✓ Keine Werbung<br>✓ Meine Statistiken<br>✓ Saison-Rückblick zum Teilen<br>✓ ⭐ in der Rangliste<br>✓ Fotoalbum<br>✓ Überholt-Hinweis<br>✓ Badges${prizeOn()?'<br>✓ 🏆 2 Dosen Bälle als Saisonsieger':''}</div></div></div><div style='margin-top:14px'>${plans}${(SB.live&&!A.session&&!on)?`<div class='sub' style='margin-top:8px'>Zum Kaufen melde dich bitte zuerst an. <span class='lnk' onclick="view='login';render()">Anmelden</span></div>`:''}</div>${(on||!avail)?'':`<button class='btn ghost' onclick='restoreBuy()'>Käufe wiederherstellen</button>`}${(!NATIVE&&!live&&!SB.live)?`<button class='btn ghost' onclick='togglePrem()'>Vorschau: Premium ${on?'aus':'ein'}schalten (kein echter Kauf)</button>`:''}${avail?`<div class='sub' style='margin-top:12px;line-height:1.5'>${pk('MONTHLY')?`<b>Monatsabo:</b> ${esc(price('MONTHLY',''))} pro Monat, Verlängerung jeden Monat. `:''}${pk('ANNUAL')?`<b>Jahresabo:</b> ${esc(price('ANNUAL',''))} pro Jahr, Verlängerung jedes Jahr.`:''}<br>Das Abonnement verlängert sich automatisch um den gleichen Zeitraum, wenn es nicht mindestens 24 Stunden vor Ablauf des laufenden Zeitraums in den Einstellungen deines App-Store- bzw. Google-Play-Kontos gekündigt wird. Die Zahlung wird bei Kaufbestätigung über dein Store-Konto abgerechnet. Kündigen kannst du jederzeit in den Konto-Einstellungen des Stores. <span class='lnk' onclick="view='legal';render()">Nutzungsbedingungen & Datenschutz</span></div>`:''}</div><div class='card'><h3>📊 Siegquoten · ${lg().name}</h3>${lock(bars||"<div class='empty'>Keine Spieler</div>")}</div><div class='card'><h3>🏅 Badges · ${lg().name}</h3>${lock(bd)}</div><div class='card'><h3>🏢 Hallen-Lizenz</h3><div class='sub' style='font-size:14px;color:var(--tx)'>Geplant: Die Halle bucht Premium für <b>alle Mitglieder</b>. Noch nicht verfügbar.</div></div>`;
 }
-function closeM(){document.getElementById("modal").classList.add("hide");syncBanner();if(_askRes){const r=_askRes;_askRes=null;r(false)}}
+function closeM(){if(TOS_OPEN)return;document.getElementById("modal").classList.add("hide");syncBanner();if(_askRes){const r=_askRes;_askRes=null;r(false)}}
 async function resetAll(){if(await ask("Alle Daten zurücksetzen?","Zurücksetzen",1)){S=seedAll();save();view="rank";render()}}
 window.addEventListener('storage',e=>{if(e.key=='padel3')reloadS()});{const mp=mine();if(mp){S.hall=mp.hall;cur=mp.league}}
 AD.wait=!!(SB.live&&(A.session||secPlugin()));if(AD.wait)setTimeout(()=>{if(AD.wait){AD.wait=false;render()}},5000);
