@@ -1631,7 +1631,7 @@ function confCard(){if(isR()&&!RM.ready)return'';const a=toConfirm(),b=myPending
  return h}
 function navBadge(){let b=null;try{b=document.querySelector('#nav button[data-v=rank]')}catch(e){}if(!b||!b.querySelector)return;const n=toConfirm().length;let e=b.querySelector('.nb');if(!n){if(e)e.remove();return}if(!e){e=document.createElement('b');e.className='nb';b.appendChild(e)}e.textContent=n>9?'9+':String(n);b.setAttribute('aria-label','Rangliste, '+n+' Ergebnis'+(n==1?'':'se')+' zu bestätigen')}
 /* ===== E-Mail-Erinnerung (Server: Migration 013) ===== */
-const MAIL_LIVE=false; // auf true setzen, sobald ein E-Mail-Dienst (z. B. Brevo) in Supabase eingerichtet ist
+const MAIL_LIVE=true; // E-Mail-Versand läuft (Brevo, seit 08.11.2026)
 async function mailSet(on){try{await rpc('set_notify_email',{p_on:!!on});RM.mail=!!on;toast(on?'E-Mail-Erinnerung an':'E-Mail-Erinnerung aus')}catch(e){msg(e.message||'Das hat nicht geklappt.')}render()}
 const SB={url:'https://qnvevifgvplmqpwzsuca.supabase.co',anon:'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFudmV2aWZndnBsbXFwd3pzdWNhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTMxNzk4OTgsImV4cCI6MjEwODc1NTg5OH0.wbgfCuaolPsjObiPoK5EoBChsSGM4dw6rdGutbvvmm4',get live(){return !!(this.url&&this.anon)}};
 /* Mit Server: keine Vorschau-/Beispieldaten anzeigen, bis die echten Daten geladen sind */
@@ -2256,7 +2256,7 @@ function themeSet(t){lsSet('padel_theme',t);themeApply();render()}
 try{matchMedia('(prefers-color-scheme: dark)').addEventListener('change',()=>{if(themeGet()=='auto')themeApply()})}catch(e){}
 function themeCard(){const t=themeGet(),b=(k,l)=>`<button type="button" class="${t==k?'on':''}" onclick="themeSet('${k}')">${l}</button>`;return `<div class="card"><h3>🌓 Darstellung</h3><div class="thm">${b('auto','Automatisch')}${b('light','☀️ Hell')}${b('dark','🌙 Dunkel')}</div><div class="sub" style="margin-top:6px">„Automatisch“ folgt der Einstellung deines iPhones.</div></div>`}
 /* ===== Automatische Aktualisierung (nur Website-Version): neue Version erkennen und neu laden ===== */
-const APP_VERSION='20261108-165223';
+const APP_VERSION='20261108-185234';
 async function updCheck(){if(NATIVE||!SB.live||APP_VERSION=='dev'||document.hidden)return;
  try{const r=await fetch('version.json?ts='+Date.now(),{cache:'no-store'});if(!r.ok)return;const v=(await r.json()).v;if(!v||v==APP_VERSION)return;
   let tried=null;try{tried=sessionStorage.getItem('padel_upd')}catch(e){}if(tried==v)return;
