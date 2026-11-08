@@ -1,0 +1,16 @@
+{
+ "name": "PadelRun",
+ "short_name": "PadelRun",
+ "start_url": "./",
+ "scope": "./",
+ "display": "standalone",
+ "background_color": "#f1f4fa",
+ "theme_color": "#2a55ff",
+ "icons": [
+  {
+   "src": "../apple-touch-icon.png",
+   "sizes": "180x180",
+   "type": "image/png"
+  }
+ ]
+}
