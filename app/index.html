@@ -1702,7 +1702,7 @@ function accountCard(){const x=A.session;
  const em=(x.user&&x.user.email)||'',relay=/privaterelay\.appleid\.com$/i.test(em);
  return `<div class='card'><b>Angemeldet</b><div class='sub' style='margin:4px 0 8px'>${esc(em||'Apple-Konto')}${relay?' (Apple-Weiterleitung, deine echte E-Mail bleibt privat)':''}</div><button class='btn ghost' style='margin:0' onclick='logout()'>Abmelden</button></div>`}
 function renderLogin(){const live=SB.live,gateOn=live;
- document.getElementById('login').innerHTML=(live?joinHint():'')+`<div class='card'><div style='text-align:center'><div style='font-size:40px'>🎾</div><h3 style='font-size:22px;margin:4px 0'>Padel<span style="color:var(--blt);font-style:italic">Run</span></h3><div class='sub'>${gateOn?'Die Rangliste deiner Padel-Halle. Erstelle ein Konto oder melde dich an. Danach trittst du mit dem Code deiner Halle bei.':'Melde dich an, um deine Rangliste zu nutzen.'}</div>${gateOn?`<div class='feat'><span>🏆 Rookie · Smash · Elite</span><span>📅 4-Wochen-Saisons</span><span>📸 Siegerfotos</span></div>`:''}</div>
+ document.getElementById('login').innerHTML=(live?joinHint():'')+`<div class='card'><div style='text-align:center'><div style='font-size:40px'>🎾</div><h3 style='font-size:22px;margin:4px 0'>Padel<span style="color:var(--blt);font-style:italic">Run</span></h3><div class='sub'>${gateOn?'Die Rangliste deiner Padel-Halle. Erstelle ein Konto oder melde dich an. Danach trittst du mit dem Code deiner Halle bei.':'Melde dich an, um deine Rangliste zu nutzen.'}</div>${gateOn?`<div class='feat'><span>🏆 Rookie · Smash · Elite</span><span>🎯 Beste 6 zählen</span><span>📸 Siegerfotos</span></div>`:''}</div>
 ${(NATIVE||(window.Capacitor&&Capacitor.Plugins&&Capacitor.Plugins.SignInWithApple))?`<button class='apple' onclick='appleLogin()'>${APPLE_SVG}<span>Mit Apple anmelden</span></button>
 <div class='sub' style='text-align:center;margin:14px 0 4px'>oder mit E-Mail</div>`:''}
 <label>E-Mail</label><input id='ae' type='email' inputmode='email' autocomplete='email' autocapitalize='none'>
@@ -2252,7 +2252,7 @@ function themeSet(t){lsSet('padel_theme',t);themeApply();render()}
 try{matchMedia('(prefers-color-scheme: dark)').addEventListener('change',()=>{if(themeGet()=='auto')themeApply()})}catch(e){}
 function themeCard(){const t=themeGet(),b=(k,l)=>`<button type="button" class="${t==k?'on':''}" onclick="themeSet('${k}')">${l}</button>`;return `<div class="card"><h3>🌓 Darstellung</h3><div class="thm">${b('auto','Automatisch')}${b('light','☀️ Hell')}${b('dark','🌙 Dunkel')}</div><div class="sub" style="margin-top:6px">„Automatisch“ folgt der Einstellung deines iPhones.</div></div>`}
 /* ===== Automatische Aktualisierung (nur Website-Version): neue Version erkennen und neu laden ===== */
-const APP_VERSION='20261108-125126';
+const APP_VERSION='20261108-162048';
 async function updCheck(){if(NATIVE||!SB.live||APP_VERSION=='dev'||document.hidden)return;
  try{const r=await fetch('version.json?ts='+Date.now(),{cache:'no-store'});if(!r.ok)return;const v=(await r.json()).v;if(!v||v==APP_VERSION)return;
   let tried=null;try{tried=sessionStorage.getItem('padel_upd')}catch(e){}if(tried==v)return;

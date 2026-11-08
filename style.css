@@ -25,3 +25,7 @@ ol li,ul li{margin:4px 0}
 .todo{background:#fff3cd;color:#6b4a00;border-radius:6px;padding:1px 6px;font-size:14px;font-weight:600}
 
 .wmr{color:#c8f31d;font-style:italic}
+
+nav a.navapp{background:#c8f31d;color:#0e1b3d}
+.cta{display:inline-block;margin-top:14px;background:#2a55ff;color:#fff;font-weight:800;font-size:17px;padding:13px 22px;border-radius:14px;text-decoration:none}
+.cta:hover{filter:brightness(1.08)}
