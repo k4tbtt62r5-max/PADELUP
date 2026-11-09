@@ -1553,7 +1553,7 @@ function posterCanvas(h){const W=1240,H=1754,c=document.createElement('canvas');
  const rr=(X,Y,w,hh,r)=>{x.beginPath();if(x.roundRect)x.roundRect(X,Y,w,hh,r);else x.rect(X,Y,w,hh)};
  x.fillStyle='#ffffff';x.fillRect(0,0,W,H);x.fillStyle='#0e1b3d';x.fillRect(0,0,W,330);
  wmC(x,W/2,175,'900 120px system-ui,-apple-system,Segoe UI,Arial','center');
- x.fillStyle='#ffffff';x.font='700 44px system-ui,-apple-system,Segoe UI,Arial';x.fillText('Die Rangliste dieser Halle',W/2,260);
+ x.textAlign='center';x.fillStyle='#ffffff';x.font='700 44px system-ui,-apple-system,Segoe UI,Arial';x.fillText('Die Rangliste dieser Halle',W/2,260);
  x.fillStyle='#0e1b3d';let fs=76;x.font='900 '+fs+'px system-ui,-apple-system,Segoe UI,Arial';while(x.measureText(h.name).width>W-140&&fs>40){fs-=4;x.font='900 '+fs+'px system-ui,-apple-system,Segoe UI,Arial'}x.fillText(h.name,W/2,450);
  const q=new QRLIB(-1,0);q.addData(joinUrl(h.code));q.make();const n=q.getModuleCount(),S0=640,m=Math.floor(S0/(n+8)),qs=m*(n+8),qx=(W-qs)/2,qy=510;
  x.fillStyle='#c8f31d';rr(qx-24,qy-24,qs+48,qs+48,36);x.fill();x.fillStyle='#ffffff';rr(qx,qy,qs,qs,18);x.fill();x.fillStyle='#000000';
@@ -2256,7 +2256,7 @@ function themeSet(t){lsSet('padel_theme',t);themeApply();render()}
 try{matchMedia('(prefers-color-scheme: dark)').addEventListener('change',()=>{if(themeGet()=='auto')themeApply()})}catch(e){}
 function themeCard(){const t=themeGet(),b=(k,l)=>`<button type="button" class="${t==k?'on':''}" onclick="themeSet('${k}')">${l}</button>`;return `<div class="card"><h3>🌓 Darstellung</h3><div class="thm">${b('auto','Automatisch')}${b('light','☀️ Hell')}${b('dark','🌙 Dunkel')}</div><div class="sub" style="margin-top:6px">„Automatisch“ folgt der Einstellung deines iPhones.</div></div>`}
 /* ===== Automatische Aktualisierung (nur Website-Version): neue Version erkennen und neu laden ===== */
-const APP_VERSION='20261108-190058';
+const APP_VERSION='20261109-083530';
 async function updCheck(){if(NATIVE||!SB.live||APP_VERSION=='dev'||document.hidden)return;
  try{const r=await fetch('version.json?ts='+Date.now(),{cache:'no-store'});if(!r.ok)return;const v=(await r.json()).v;if(!v||v==APP_VERSION)return;
   let tried=null;try{tried=sessionStorage.getItem('padel_upd')}catch(e){}if(tried==v)return;
