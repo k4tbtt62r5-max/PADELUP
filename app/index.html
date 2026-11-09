@@ -133,6 +133,7 @@ body.gated .hero{padding-bottom:22px}body.gated .wrap{margin-top:16px}
 .zt{display:inline-block;font-size:11.5px;font-weight:800;border-radius:7px;padding:2px 7px;margin-left:6px;vertical-align:middle}
 .zt.y{background:var(--lime);color:#1b2a00}.zt.n{background:var(--soft);color:var(--mu)}
 .rpl6{display:inline-block;margin:8px 0 0;background:var(--limetint);color:var(--tx);border-radius:8px;padding:4px 9px;font-size:12px;font-weight:700}.rpl6.n{background:var(--soft);color:var(--mu)}
+.tqw{white-space:nowrap}
 .tq{display:inline-block;background:var(--soft);color:var(--tx);border-radius:7px;padding:1px 6px;font-size:11.5px;font-weight:700}
 .wmr{color:var(--lime);font-style:italic}
 .gpill{display:inline-block;margin-left:6px;padding:1px 7px;border-radius:999px;border:1px dashed var(--br);font-size:11px;font-weight:700;color:var(--mu);white-space:nowrap}.gsth{margin:10px 0 0;padding:10px 12px;border-radius:12px;font-size:13px;line-height:1.4;border:1px dashed var(--br)}.row.gstrow .gav{width:36px;height:36px;font-size:15px}
@@ -327,7 +328,7 @@ function g6(p){return (p.w||0)+(p.l||0)>=6?1:0}
 function qr(p){const g=(p.w||0)+(p.l||0);return g?p.w/g:-1}
 function cmp(a,b){return b.pts-a.pts||g6(b)-g6(a)||qr(b)-qr(a)||(a.pa||0)-(b.pa||0)||a.name.localeCompare(b.name)}
 function pq(p){const g=(p.w||0)+(p.l||0);return g?Math.round(p.w/g*100)+' %':'–'}
-function tieTag(p,lst){if(!p.pts||!lst.some(x=>x.id!=p.id&&x.pts==p.pts))return '';return ` · <span class="tq">⚖️ ${g6(p)?pq(p)+' Siege':'unter 6 Spielen'}</span>`}
+function tieTag(p,lst){if(!p.pts||!lst.some(x=>x.id!=p.id&&x.pts==p.pts))return '';return ` <span class="tqw">·&nbsp;<span class="tq">⚖️ ${g6(p)?pq(p)+' Siege':'unter 6 Spielen'}</span></span>`}
 function tieWhy(p,t){if(!t.pts)return 'dein erstes Spiel bringt dich nach vorne';if(g6(t)&&!g6(p)){const f=6-p.w-p.l;return `wer mindestens 6 Spiele hat, steht vorne – dir ${f==1?'fehlt noch 1 Spiel':'fehlen noch '+f+' Spiele'}`}
  if(qr(t)!=qr(p))return `${esc(t.name)} hat die bessere Siegquote: <b>${pq(t)}</b> zu deinen <b>${pq(p)}</b>. Ein Sieg bringt dich näher`;
  return `${esc(t.name)} hat die Punktzahl früher erreicht`}
@@ -1542,9 +1543,9 @@ async function joinPending(){const c=lsGet('padel_join',null);if(!c||JN||!isR()|
 function joinHint(){const c=lsGet('padel_join',null);return c?`<div class='card' style='background:var(--limetint);border-color:var(--lime)'><b>🎟️ Du wurdest eingeladen</b><div class='sub' style='font-size:14px;color:var(--tx);margin-top:4px;line-height:1.5'>Hallencode <b>${esc(c)}</b>. ${!A.session?'Erstelle ein Konto oder melde dich an. Danach trittst du der Halle automatisch bei.':'Lege dein Profil mit deinem Level an. Danach trittst du der Halle automatisch bei.'}</div></div>`:''}
 function invH(){const h=curHall();return h&&!h.none&&h.code?h:null}
 function invText(kind,m){const h=invH();if(!h)return '';const u=joinUrl(h.code);
- if(kind=='opp')return `Hey! Lass uns unser Padel-Match in PadelRun eintragen 🎾 Tritt der Rangliste von ${h.name} bei: ${u} (Hallencode ${h.code}). Danach kann ich dich als Gegner auswählen.`;
+ if(kind=='opp')return `Hey! Lass uns unser Padel-Match in PadelRun eintragen 🏆 Tritt der Rangliste von ${h.name} bei: ${u} (Hallencode ${h.code}). Danach kann ich dich als Gegner auswählen.`;
  if(kind=='remind')return `Hey! Ich habe unser Padel-Ergebnis${m&&m.sc?' ('+m.sc+')':''} in PadelRun eingetragen. Bitte bestätige es kurz in der App: ${APP_URL}`;
- return `Komm in unsere Padel-Rangliste bei ${h.name}! 🎾 Rookie, Smash und Elite, neue Saison alle 4 Wochen. App öffnen und beitreten: ${u} (Hallencode ${h.code})`}
+ return `Komm in unsere Padel-Rangliste bei ${h.name}! 🏆 Rookie, Smash und Elite, neue Saison alle 4 Wochen. App öffnen und beitreten: ${u} (Hallencode ${h.code})`}
 function shareSheet(t,title){if(!t){msg('Dafür musst du zuerst einer Halle beitreten.');return}window._sht=t;
  sheet(`<h3>${esc(title||'Einladen')}</h3><div class='sub' style='font-size:14px;color:var(--tx);background:var(--soft);border-radius:12px;padding:10px 12px;margin-bottom:10px;line-height:1.5;white-space:pre-wrap'>${esc(t)}</div><a class='btn' style='display:block;text-align:center;text-decoration:none;background:#25d366;color:#fff' href='https://wa.me/?text=${encodeURIComponent(t)}' target='_blank' rel='noopener'>Per WhatsApp senden</a>${(navigator.share||(window.Capacitor&&Capacitor.Plugins&&Capacitor.Plugins.Share))?`<button class='btn ghost' onclick='shareOther()'>Andere App …</button>`:''}<button class='btn ghost' onclick='shareCopy()'>Text kopieren</button><button class='btn ghost' onclick='closeM()'>Schließen</button>`)}
 async function shareOther(){const t=window._sht;try{if(navigator.share){await navigator.share({text:t});return}const SH=window.Capacitor&&Capacitor.Plugins&&Capacitor.Plugins.Share;if(SH)await SH.share({text:t})}catch(e){}}
@@ -1709,7 +1710,7 @@ function accountCard(){const x=A.session;
  const em=(x.user&&x.user.email)||'',relay=/privaterelay\.appleid\.com$/i.test(em);
  return `<div class='card'><b>Angemeldet</b><div class='sub' style='margin:4px 0 8px'>${esc(em||'Apple-Konto')}${relay?' (Apple-Weiterleitung, deine echte E-Mail bleibt privat)':''}</div><button class='btn ghost' style='margin:0' onclick='logout()'>Abmelden</button></div>`}
 function renderLogin(){const live=SB.live,gateOn=live;
- document.getElementById('login').innerHTML=(live?joinHint():'')+`<div class='card'><div style='text-align:center'><div style='font-size:40px'>🎾</div><h3 style='font-size:22px;margin:4px 0'>Padel<span style="color:var(--blt);font-style:italic">Run</span></h3><div class='sub'>${gateOn?'Die Rangliste deiner Padel-Halle. Erstelle ein Konto oder melde dich an. Danach trittst du mit dem Code deiner Halle bei.':'Melde dich an, um deine Rangliste zu nutzen.'}</div>${gateOn?`<div class='feat'><span>🏆 Rookie · Smash · Elite</span><span>🎯 Beste 6 zählen</span><span>📸 Siegerfotos</span></div>`:''}</div>
+ document.getElementById('login').innerHTML=(live?joinHint():'')+`<div class='card'><div style='text-align:center'><div style='font-size:40px'>🏆</div><h3 style='font-size:22px;margin:4px 0'>Padel<span style="color:var(--blt);font-style:italic">Run</span></h3><div class='sub'>${gateOn?'Die Rangliste deiner Padel-Halle. Erstelle ein Konto oder melde dich an. Danach trittst du mit dem Code deiner Halle bei.':'Melde dich an, um deine Rangliste zu nutzen.'}</div>${gateOn?`<div class='feat'><span>🏆 Rookie · Smash · Elite</span><span>🎯 Beste 6 zählen</span><span>📸 Siegerfotos</span></div>`:''}</div>
 ${(NATIVE||(window.Capacitor&&Capacitor.Plugins&&Capacitor.Plugins.SignInWithApple))?`<button class='apple' onclick='appleLogin()'>${APPLE_SVG}<span>Mit Apple anmelden</span></button>
 <div class='sub' style='text-align:center;margin:14px 0 4px'>oder mit E-Mail</div>`:''}
 <label>E-Mail</label><input id='ae' type='email' inputmode='email' autocomplete='email' autocapitalize='none'>
@@ -2198,7 +2199,7 @@ function ovtCard(){const me=mine();if(!S.premium||!me||me.hall!=S.hall||cur!=me.
  if(o&&o.season==S.season.id&&rk>o.rank){const nu=above.filter(id=>!(o.above||[]).includes(id)).map(id=>(S.players.find(x=>x.id==id)||{}).name).filter(Boolean);
   const t=nu.length?nu.slice(0,2).join(' und ')+(nu.length>2?' und weitere':''):'Jemand';lsSet(k,Object.assign({},o,{show:t}));return ovtHtml(t,rk)}
  lsSet(k,{season:S.season.id,rank:rk,above});return''}
-function ovtHtml(t,rk){return `<div class="card ovt"><b>📉 ${esc(t)} ${t.includes(' und ')?'haben':'hat'} dich überholt!</b><div class="sub" style="margin:4px 0 10px;color:var(--tx)">Du bist jetzt auf Platz ${rk}. Zeit für ein Match? 🎾</div><div class="two"><button class="btn" style="margin:0;padding:10px" onclick="view='res';render()">Ergebnis eintragen</button><button class="btn ghost" style="margin:0;padding:10px" onclick="ovtOk()">OK</button></div></div>`}
+function ovtHtml(t,rk){return `<div class="card ovt"><b>📉 ${esc(t)} ${t.includes(' und ')?'haben':'hat'} dich überholt!</b><div class="sub" style="margin:4px 0 10px;color:var(--tx)">Du bist jetzt auf Platz ${rk}. Zeit für ein Match? 💪</div><div class="two"><button class="btn" style="margin:0;padding:10px" onclick="view='res';render()">Ergebnis eintragen</button><button class="btn ghost" style="margin:0;padding:10px" onclick="ovtOk()">OK</button></div></div>`}
 function ovtOk(){const me=mine();if(!me)return;const lst=sorted(),rk=lst.findIndex(x=>x.id==me.id)+1;lsSet('padel_rk_'+S.hall+'_'+me.league,{season:S.season.id,rank:rk,above:lst.slice(0,rk-1).map(x=>x.id)});render()}
 /* eigene Spiele aller Saisons, einheitlich */
 async function loadHist(){if(!isR()){return}try{const r=await rpc('my_match_history',{p_hall:RM.hall});const urls=await signUrls(r.flatMap(m=>[m.winner_photo_path,m.match_photo_path]));
@@ -2245,7 +2246,7 @@ function recapCanvas(r){const c=document.createElement('canvas');c.width=1080;c.
  x.fillStyle='#c8f31d';x.font='900 300px '+F;x.fillText(r.rank+'.',70,540);x.fillStyle='#fff';x.font='800 64px '+F;x.fillText('Platz in '+LN(r.league)+' von '+r.of,80,630);
  const box=(bx,by,big,lab)=>{x.fillStyle='rgba(255,255,255,.14)';x.beginPath();if(x.roundRect)x.roundRect(bx,by,440,190,36);else x.rect(bx,by,440,190);x.fill();x.fillStyle='#fff';x.font='900 88px '+F;x.fillText(big,bx+36,by+110);x.font='700 34px '+F;x.globalAlpha=.8;x.fillText(lab,bx+36,by+160);x.globalAlpha=1};
  box(80,700,String(r.pts),'Punkte');box(560,700,r.w+' / '+r.l,'Siege / Niederlagen');box(80,920,String(r.best),'Beste Siegesserie');box(560,920,r.partner?r.partner.nm.split(' ')[0]:'–','Bester Partner');
- x.fillStyle='#c8f31d';x.font='800 40px '+F;x.fillText('🎾 Wer wird König deiner Halle?',80,1250);return c}
+ x.fillStyle='#c8f31d';x.font='800 40px '+F;x.fillText('🏆 Wer wird König deiner Halle?',80,1250);return c}
 function recapShow(id){const se=(S.history||[]).find(x=>x.id==id),r=se&&seasonRecap(se,S.me.pid);if(!r)return;let u='';try{u=recapCanvas(r).toDataURL('image/png')}catch(e){}
  RM._rec=u;sheet(`<h3>Dein Rückblick · Saison ${esc(r.no)}</h3><img src="${u}" alt="Saison-Rückblick" style="width:100%;border-radius:14px;display:block;margin:6px 0 10px"><button class="btn lime" onclick="recapShare(${jid(id)})">Teilen</button><div class="sub" style="margin-top:6px">Falls Teilen nicht geht: Bild lange drücken und „Sichern“ wählen.</div><button class="btn ghost" onclick="closeM()">Schließen</button>`)}
 async function recapShare(id){try{const b=await (await fetch(RM._rec)).blob(),f=new File([b],'padelup-saison.png',{type:'image/png'});
@@ -2259,7 +2260,7 @@ function themeSet(t){lsSet('padel_theme',t);themeApply();render()}
 try{matchMedia('(prefers-color-scheme: dark)').addEventListener('change',()=>{if(themeGet()=='auto')themeApply()})}catch(e){}
 function themeCard(){const t=themeGet(),b=(k,l)=>`<button type="button" class="${t==k?'on':''}" onclick="themeSet('${k}')">${l}</button>`;return `<div class="card"><h3>🌓 Darstellung</h3><div class="thm">${b('auto','Automatisch')}${b('light','☀️ Hell')}${b('dark','🌙 Dunkel')}</div><div class="sub" style="margin-top:6px">„Automatisch“ folgt der Einstellung deines iPhones.</div></div>`}
 /* ===== Automatische Aktualisierung (nur Website-Version): neue Version erkennen und neu laden ===== */
-const APP_VERSION='20261109-100319';
+const APP_VERSION='20261109-120352';
 async function updCheck(){if(NATIVE||!SB.live||APP_VERSION=='dev'||document.hidden)return;
  try{const r=await fetch('version.json?ts='+Date.now(),{cache:'no-store'});if(!r.ok)return;const v=(await r.json()).v;if(!v||v==APP_VERSION)return;
   let tried=null;try{tried=sessionStorage.getItem('padel_upd')}catch(e){}if(tried==v)return;
