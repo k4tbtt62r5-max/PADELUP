@@ -380,9 +380,9 @@ function mrow(v,ic,t,sub,badge){return `<div class="row mrow" onclick="view='${v
 function mgrp(t,rows){rows=rows.filter(Boolean);return rows.length?`<div class="mgrp">${t}</div><div class="card" style="padding:2px 14px">${rows.join('')}</div>`:''}
 function renderMore(){ADM.list=null;RM.hist=null;ADM.hall=null;if(typeof OWN!='undefined'){OWN.hall=null;OWN.halls=null;OWN.members=null;OWN.tab=null;OWN.ads=null}const ad=isR()&&curHall()&&curHall().role=="admin",h=curHall(),nadm=(RM.nrep||0)+(RM.nlv||0),pill=(n,t)=>n?` <span class="pill mpill">${n}${t||''}</span>`:'';
  document.getElementById("more").innerHTML=mgrp('Verwaltung',[RM.owner&&mrow('owner','crown','Betreiber-Bereich','Hallen, Konten, Werbung, Saisonpreis',pill(RM.njoin,' neu')),ad&&mrow('admin','shield','Meldungen &amp; Freigaben','Meldungen, Level-Wechsel in niedrigere Ligen',pill(nadm))])
- +mgrp('Mein Konto',[mrow('profile','user','Mein Profil','Name, Level, Mitteilungen'),mrow('stats','chart','Meine Statistiken','Direktvergleich, Punkte-Verlauf, Rückblicke, Fotoalbum',S.premium?'':' <span class="mstar">★</span>'),mrow('prem','star','Premium','Statistiken, Badges, keine Werbung'),mrow('login','key','Anmeldung','Mit Apple oder E-Mail')])
+ +mgrp('Mein Konto',[mrow('profile','user','Mein Profil','Name, Level, Mitteilungen'),premShow()&&mrow('stats','chart','Meine Statistiken','Direktvergleich, Punkte-Verlauf, Rückblicke, Fotoalbum',S.premium?'':' <span class="mstar">★</span>'),premShow()&&mrow('prem','star','Premium','Statistiken, Badges, keine Werbung'),mrow('login','key','Anmeldung','Mit Apple oder E-Mail')])
  +mgrp('Halle',[mrow('halls','pin','Halle wechseln',h&&!h.none?esc(h.name):'Jede Halle hat eine eigene Rangliste'),isR()?mrow('halls','users','Spieler einladen','QR-Code, Link, Aushang'):mrow('add','users','Spieler hinzufügen','Neue Spieler in deiner Halle anlegen'),mrow('blocked','ban','Blockierte Spieler','Blockierungen verwalten')])
- +mgrp('Info',[mrow('pts','info','Punkte &amp; Level erklärt','So wird gezählt, Ligen, Level'),mrow('adinfo','mega','Werbung &amp; Datenschutz','Werbung melden, Einstellungen'),mrow('legal','doc','Rechtliches','Datenschutz, Nutzungsbedingungen, Impressum')])}
+ +mgrp('Info',[mrow('pts','info','Punkte &amp; Level erklärt','So wird gezählt, Ligen, Level'),adShow()&&mrow('adinfo','mega','Werbung &amp; Datenschutz','Werbung melden, Einstellungen'),mrow('legal','doc','Rechtliches','Datenschutz, Nutzungsbedingungen, Impressum')])}
 function esc(t){return String(t).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
 function av(p,s){if(p&&p.img&&!(S.blocked||[]).includes(p.id))return `<img class="av" style="width:${s}px;height:${s}px" src="${p.img}" alt="">`;
   const n=p?p.name:"?",c=COL[(n.charCodeAt(0)||0)%COL.length];
@@ -534,6 +534,9 @@ function saveProfile(){if(isR())return rSaveProfile();
 function emptyS(){const d=seedAll();d.players=[];d.matches=[];d.history=[];d.halls=[{id:'h1',name:'Meine Halle'}];d.hall='h1';d.season={id:1,start:Date.now(),end:Date.now()+28*864e5};d.me={name:'',email:'',pid:null};return d}
 const BILLING={key:'',ent:'premium',get plugin(){return(window.Capacitor&&window.Capacitor.Plugins&&window.Capacitor.Plugins.Purchases)||null},get live(){return !!(this.plugin&&this.key)}};
 let OFF=null;
+/* Premium nur zeigen, wenn es kaufbar ist (App Store) oder jemand es schon hat – Start ohne Premium (Entscheidung 09.11.2026) */
+function adShow(){return !!(ADS.admob||AD.demo||(AD.camps&&AD.camps.length))}
+function premShow(){return !!(S.premium||BILLING.live)}
 /* QR-Code-Erzeugung: "QRCode for JavaScript" (c) 2009 Kazuhiko Arase, MIT-Lizenz, http://www.d-project.com/ – über qrcode-terminal (Apache-2.0). "QR Code" ist eine Marke der DENSO WAVE INCORPORATED. */
 const QRLIB=(function(){var M={},C={};function req(n){if(C[n])return C[n].exports;var m={exports:{}};C[n]=m;M[n](m,m.exports,req);return m.exports}
 M['./QR8bitByte']=function(module,exports,require){var QRMode = require('./QRMode');
@@ -1774,14 +1777,14 @@ function askDone(v){const r=_askRes;_askRes=null;closeM();if(r)r(v)}
 /* ===== Werbung =====
    Banner: Google AdMob (nativ, nur in der App). Anzeigenkarten im Feed: eigene Partner-Anzeigen von Padelhallen/Sportmarken (aus der Datenbank, ohne Tracking).
    VOR DEM STORE-RELEASE: echte AdMob-Banner-ID eintragen und testing:false setzen. Die ID unten ist Googles öffentliche TEST-ID. */
-const ADS={bannerUnit:{ios:'ca-app-pub-3940256099942544/2934735716'},testing:true,bannerViews:['rank','feed','season'],feedEvery:5,feedMin:3,feedMax:2,impGapMs:18e5,dayCap:6};
+const ADS={admob:false /* Start ohne Werbung (Entscheidung 09.11.2026): AdMob wird gar nicht geladen */,bannerUnit:{ios:'ca-app-pub-3940256099942544/2934735716'},testing:true,bannerViews:['rank','feed','season'],feedEvery:5,feedMin:3,feedMax:2,impGapMs:18e5,dayCap:6};
 let AD={init:false,ready:false,npa:true,created:false,visible:false,camps:[],demo:false,q:Promise.resolve(),adh:0};
 function lsGet(k,d){try{const r=localStorage.getItem(k);return r?JSON.parse(r):d}catch(e){return d}}
 function lsSet(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
 AD.hidden=lsGet('padel_adhid',[]);AD.cap=lsGet('padel_adcap',{});AD.queue=lsGet('padel_adq',[]);
 const DEMO_CAMPS=[{id:'demo-1',advertiser:'Beispiel: Padel Sport Shop',headline:'10 % auf alle Schläger',body:'Nur diese Woche. Zeige diese Anzeige an der Kasse.',image_url:null,cta_label:'Mehr erfahren',cta_url:'https://example.com/'},{id:'demo-2',advertiser:'Beispiel: Padelhalle Nord',headline:'Schnupperkurs für Einsteiger',body:'Jeden Samstag um 10 Uhr. Schläger werden gestellt.',image_url:null,cta_label:'Termin ansehen',cta_url:'https://example.com/'}];
 const ADREASONS=['Unangemessen oder anstößig','Irreführend oder Betrug','Zu aufdringlich oder störend','Falsche oder gefährliche Zielseite','Sonstiges'];
-function adPlugin(){return(window.Capacitor&&window.Capacitor.Plugins&&window.Capacitor.Plugins.AdMob)||null}
+function adPlugin(){if(!ADS.admob)return null;return(window.Capacitor&&window.Capacitor.Plugins&&window.Capacitor.Plugins.AdMob)||null}
 function adsOn(){return !AD.wait&&!S.premium&&!(SB.live&&!A.session)&&view!='login'}
 function modalClosed(){return document.getElementById('modal').classList.contains('hide')}
 function wantBanner(){return adsOn()&&ADS.bannerViews.includes(view)&&modalClosed()}
@@ -1840,7 +1843,7 @@ async function openPrivacyOptions(){const P=adPlugin();if(!P||!P.showPrivacyOpti
  try{await P.showPrivacyOptionsForm()}catch(e){msg('Die Werbe-Einstellungen konnten nicht geöffnet werden. Bitte versuche es später erneut.')}}
 function renderAdInfo(){const st=S.premium?'Aus (Premium)':(NATIVE?(AD.ready?(AD.npa?'An, nicht personalisiert':'An'):'Aus (keine Einwilligung oder noch nicht eingerichtet)'):(AD.demo?'Beispiel-Vorschau':'In der Vorschau nicht verfügbar'));
  document.getElementById('adinfo').innerHTML=`<div class='card'><h3>Werbung & Datenschutz</h3><div class='sub' style='font-size:14px;color:var(--tx);line-height:1.6'><b>Status:</b> ${esc(st)}<br><br>Die kostenlose Version zeigt Werbung: einen schmalen Banner am unteren Rand (nur in Rangliste, Matches und Saison) und gelegentlich Anzeigen im Feed. Werbung ist immer als „Anzeige“ gekennzeichnet. Es gibt keine Werbung beim Login, in Profilen und bei Käufen. Mit Premium entfällt sie ganz.<br><br>Banner kommen von Google AdMob und erscheinen nur nach deiner Einwilligung. Anzeigen von Padelhallen und Sportmarken werden ohne Tracking angezeigt.</div></div>
-<div class='card'><button class='btn ghost' style='margin:0 0 8px' onclick='reportBanner()'>⚑ Werbung melden</button><button class='btn ghost' style='margin:0 0 8px' onclick='openPrivacyOptions()'>Werbe-Einstellungen ändern</button><button class='btn' style='margin:0' onclick="view='prem';render()">Werbefrei mit Premium</button></div>`}
+<div class='card'><button class='btn ghost' style='margin:0 0 8px' onclick='reportBanner()'>⚑ Werbung melden</button><button class='btn ghost' style='margin:0 0 8px' onclick='openPrivacyOptions()'>Werbe-Einstellungen ändern</button>${premShow()?`<button class='btn' style='margin:0' onclick="view='prem';render()">Werbefrei mit Premium</button>`:''}</div>`}
 /* ===== Server-Modus (Supabase) =====
    Aktiv, sobald SB.url/SB.anon gesetzt sind und der Nutzer angemeldet ist. Dann kommen Rangliste, Spiele, Hallen und Saisons
    vom Server; alle Änderungen laufen über die Server-Funktionen (Regeln und Berechtigungen prüft die Datenbank). */
@@ -2256,7 +2259,7 @@ function themeSet(t){lsSet('padel_theme',t);themeApply();render()}
 try{matchMedia('(prefers-color-scheme: dark)').addEventListener('change',()=>{if(themeGet()=='auto')themeApply()})}catch(e){}
 function themeCard(){const t=themeGet(),b=(k,l)=>`<button type="button" class="${t==k?'on':''}" onclick="themeSet('${k}')">${l}</button>`;return `<div class="card"><h3>🌓 Darstellung</h3><div class="thm">${b('auto','Automatisch')}${b('light','☀️ Hell')}${b('dark','🌙 Dunkel')}</div><div class="sub" style="margin-top:6px">„Automatisch“ folgt der Einstellung deines iPhones.</div></div>`}
 /* ===== Automatische Aktualisierung (nur Website-Version): neue Version erkennen und neu laden ===== */
-const APP_VERSION='20261109-083530';
+const APP_VERSION='20261109-100319';
 async function updCheck(){if(NATIVE||!SB.live||APP_VERSION=='dev'||document.hidden)return;
  try{const r=await fetch('version.json?ts='+Date.now(),{cache:'no-store'});if(!r.ok)return;const v=(await r.json()).v;if(!v||v==APP_VERSION)return;
   let tried=null;try{tried=sessionStorage.getItem('padel_upd')}catch(e){}if(tried==v)return;
