@@ -1,0 +1,50 @@
+# PadelRun iPhone-App: Probe-Bau ohne Signatur (prüft, dass das iOS-Projekt kompiliert).
+# Signierter Bau + Upload zu TestFlight kommt dazu, sobald das Apple-Entwicklerkonto freigeschaltet ist.
+name: iOS-Probebau
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ["native/**", ".github/workflows/ios-build.yml"]
+
+jobs:
+  build:
+    runs-on: macos-15
+    timeout-minutes: 40
+    defaults:
+      run:
+        working-directory: native
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Pakete installieren
+        run: npm install --no-audit --no-fund --legacy-peer-deps
+
+      - name: Web-App bauen
+        run: npm run build
+
+      - name: iOS-Projekt erzeugen
+        run: npx cap add ios
+
+      - name: Info.plist ergänzen (ohne Tracking/Werbung)
+        run: |
+          P=ios/App/App/Info.plist
+          /usr/libexec/PlistBuddy -c "Add :NSPhotoLibraryUsageDescription string 'Damit du Siegerfotos und ein Profilbild hochladen kannst.'" "$P"
+          /usr/libexec/PlistBuddy -c "Add :NSCameraUsageDescription string 'Damit du direkt nach dem Match ein Siegerfoto aufnehmen kannst.'" "$P"
+          /usr/libexec/PlistBuddy -c "Add :ITSAppUsesNonExemptEncryption bool false" "$P"
+          cp ios-vorlagen/PrivacyInfo.xcprivacy ios/App/App/PrivacyInfo.xcprivacy
+
+      - name: Capacitor synchronisieren
+        run: npx cap sync ios
+
+      - name: Kompilieren (Simulator, ohne Signatur)
+        run: |
+          cd ios/App
+          if [ -f App.xcworkspace/contents.xcworkspacedata ]; then T="-workspace App.xcworkspace"; else T="-project App.xcodeproj"; fi
+          xcodebuild $T -scheme App -configuration Debug -sdk iphonesimulator -destination 'generic/platform=iOS Simulator' CODE_SIGNING_ALLOWED=NO build | tail -n 60
+          exit ${PIPESTATUS[0]}
