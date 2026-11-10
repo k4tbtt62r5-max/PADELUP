@@ -1,14 +1,152 @@
 <!DOCTYPE html>
-<html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>PadelRun – Padel-Rangliste für deine Halle</title><meta name="description" content="PadelRun: Ranglisten, Ligen und Siegerfotos für Padel-Hallen."><link rel="stylesheet" href="style.css"><link rel="icon" href="favicon.png"><link rel="apple-touch-icon" href="apple-touch-icon.png"></head>
-<body><header><div class="in"><a href="index.html">🎾 Padel<span class="wmr">Run</span></a><p>Die Rangliste für deine Padel-Halle</p>
-<nav><a href="index.html">Start</a><a href="support.html">Hilfe &amp; Kontakt</a><a href="datenschutz.html">Datenschutz</a><a href="nutzungsbedingungen.html">Nutzungsbedingungen</a><a href="impressum.html">Impressum</a></nav></div></header><main>
-<div class="card"><span class="pill">Bald im App Store</span><h1>Wer ist die Nummer 1 in deiner Halle?</h1>
-<p>PadelRun ist die Rangliste für deine Padel-Halle. Trag deine Spiele ein, sammle Punkte in deiner Liga und feiere Siege mit einem Siegerfoto.</p><p class="mu" style="margin:12px 0 0;font-size:15px">Die App kommt bald in den App Store. Wir testen gerade mit Spielern aus unserer Halle.</p></div>
-<div class="grid">
-<div class="card"><h2>3 Ligen</h2><p class="mu">Rookie, Smash und Elite – passend zu deinem Level.</p></div>
-<div class="card"><h2>Beste 6 zählen</h2><p class="mu">Für die Rangliste zählen deine 6 besten Spiele. Qualität statt Masse.</p></div>
-<div class="card"><h2>Einzel &amp; Doppel</h2><p class="mu">Ergebnis eintragen, das gegnerische Team bestätigt – fertig.</p></div>
-<div class="card"><h2>Für Hallen</h2><p class="mu">Eigene Rangliste pro Halle, Beitritt per Hallencode, Admin-Bereich.</p></div>
-</div>
-</main><footer>PadelRun · Sören Meldau · <a href="impressum.html">Impressum</a> · <a href="datenschutz.html">Datenschutz</a></footer></body></html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>PadelRun – die Padel-Rangliste für deine Halle</title>
+<meta name="description" content="PadelRun ist eine App für Padel-Ranglisten in Hallen: Spiele eintragen, Gegner bestätigen, Punkte sammeln, in Ligen nach Spielstärke aufsteigen. Bald im App Store.">
+<link rel="canonical" href="https://padel-run.de/">
+<meta name="robots" content="index, follow, max-image-preview:large">
+<meta name="theme-color" content="#f6f5f1">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="de_DE">
+<meta property="og:site_name" content="PadelRun">
+<meta property="og:title" content="PadelRun – die Padel-Rangliste für deine Halle">
+<meta property="og:description" content="Spiele eintragen, Gegner bestätigen, Punkte sammeln. Wer ist die Nr. 1 in deiner Halle?">
+<meta property="og:url" content="https://padel-run.de/">
+<meta property="og:image" content="https://padel-run.de/assets/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="favicon.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="stylesheet" href="home.css">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": "https://padel-run.de/#org",
+      "name": "PadelRun",
+      "url": "https://padel-run.de/",
+      "logo": "https://padel-run.de/assets/icon.png",
+      "email": "padelrun.app@gmail.com",
+      "founder": {"@type": "Person", "name": "Sören Meldau"},
+      "sameAs": ["https://www.instagram.com/padel.run/"]
+    },
+    {
+      "@type": "WebSite",
+      "@id": "https://padel-run.de/#website",
+      "url": "https://padel-run.de/",
+      "name": "PadelRun",
+      "inLanguage": "de-DE",
+      "publisher": {"@id": "https://padel-run.de/#org"}
+    },
+    {
+      "@type": "MobileApplication",
+      "@id": "https://padel-run.de/#app",
+      "name": "PadelRun",
+      "alternateName": "PadelRun – Padel Rangliste",
+      "description": "Ranglisten-App für Padel-Hallen: Spiele eintragen, Ergebnisse vom gegnerischen Team bestätigen lassen, Punkte sammeln und in Ligen nach Spielstärke (Rookie, Smash, Elite) antreten.",
+      "applicationCategory": "SportsApplication",
+      "operatingSystem": "iOS",
+      "inLanguage": "de-DE",
+      "author": {"@id": "https://padel-run.de/#org"},
+      "screenshot": ["https://padel-run.de/assets/rangliste.webp", "https://padel-run.de/assets/ergebnis.webp", "https://padel-run.de/assets/matches.webp", "https://padel-run.de/assets/liste.webp"]
+    },
+    {
+      "@type": "FAQPage",
+      "@id": "https://padel-run.de/#faq",
+      "mainEntity": [
+        {"@type": "Question", "name": "Was ist PadelRun?", "acceptedAnswer": {"@type": "Answer", "text": "PadelRun ist eine App, mit der jede Padel-Halle ihre eigene Rangliste bekommt. Spieler tragen ihre Matches ein, das gegnerische Team bestätigt das Ergebnis, und alle sammeln Punkte in ihrer Liga."}},
+        {"@type": "Question", "name": "Wie trage ich ein Ergebnis ein?", "acceptedAnswer": {"@type": "Answer", "text": "In der App auf „Ergebnis“ tippen, Einzel oder Doppel wählen, die Spieler auswählen und senden. Das gegnerische Team bestätigt. Ohne Rückmeldung wird das Ergebnis nach 24 Stunden automatisch bestätigt."}},
+        {"@type": "Question", "name": "Welche Ligen gibt es?", "acceptedAnswer": {"@type": "Answer", "text": "Es gibt drei Ligen nach Spielstärke: Rookie, Smash und Elite. So spielst du um Punkte gegen Leute auf deinem Niveau."}},
+        {"@type": "Question", "name": "Wie wird die Rangliste berechnet?", "acceptedAnswer": {"@type": "Answer", "text": "Pro Saison zählen deine 6 punktstärksten Spiele. Bei Punktgleichstand entscheiden mindestens 6 Spiele, dann die höhere Siegquote, dann wer die Punktzahl zuerst erreicht hat."}},
+        {"@type": "Question", "name": "Geht PadelRun auch im Doppel und mit Gästen?", "acceptedAnswer": {"@type": "Answer", "text": "Ja. Du kannst Einzel und Doppel eintragen. Im Doppel darf ein Spieler ohne App als Gast mitspielen; der Gast bekommt keine Punkte."}},
+        {"@type": "Question", "name": "Wann und wo gibt es die App?", "acceptedAnswer": {"@type": "Answer", "text": "PadelRun kommt bald in den App Store für iPhone. Aktuell testen wir mit den ersten Spielern. Neuigkeiten gibt es auf Instagram unter @padel.run."}},
+        {"@type": "Question", "name": "Was kostet PadelRun für Hallen?", "acceptedAnswer": {"@type": "Answer", "text": "Für Hallen, die in der Startphase dabei sind, ist PadelRun kostenlos. Die Halle bekommt eine eigene Rangliste und einen Aushang mit QR-Code, über den Spieler beitreten."}},
+        {"@type": "Question", "name": "Wie trete ich der Rangliste meiner Halle bei?", "acceptedAnswer": {"@type": "Answer", "text": "Über den QR-Code auf dem Aushang in deiner Halle oder mit dem Hallencode, den du an der Theke oder von Mitspielern bekommst."}}
+        ,{"@type": "Question", "name": "Brauche ich PadelRun, wenn ich schon Playtomic nutze?", "acceptedAnswer": {"@type": "Answer", "text": "Playtomic nutzt du zum Buchen von Courts, und es zeigt dein persönliches Level. PadelRun ergänzt das: eine gemeinsame Rangliste für alle Spieler deiner Halle, mit Ligen und Saisons. Du kannst beides parallel nutzen."}}
+      ]
+    }
+  ]
+}
+</script>
+</head>
+<body>
+
+<header class="top">
+  <a class="brand" href="/" aria-label="PadelRun Startseite"><img src="assets/icon.png" width="32" height="32" alt=""><span>Padel<i>Run</i></span></a>
+  <nav aria-label="Hauptnavigation"><a href="#so-gehts">So geht's</a><a href="#hallen">Für Hallen</a><a href="#fragen">Fragen</a></nav>
+</header>
+
+<main>
+
+<section class="hero">
+  <div class="hero-text">
+    <p class="eyebrow">Bald im App Store</p>
+    <h1>Wer ist die Nr.&nbsp;1 in deiner Halle?</h1>
+    <p class="lead">PadelRun ist die Rangliste für deine Padel-Halle. Du trägst deine Spiele ein, dein Gegner bestätigt, und du siehst, wo du stehst.</p>
+    <div class="actions">
+      <a class="btn" href="https://www.instagram.com/padel.run/" rel="me">Auf Instagram folgen</a>
+      <a class="link" href="#hallen">Für Hallen →</a>
+    </div>
+  </div>
+  <figure class="phone"><img src="assets/rangliste.webp" width="585" height="1266" alt="PadelRun-App: Rangliste einer Halle mit den Plätzen 1 bis 3" fetchpriority="high"></figure>
+</section>
+
+<section id="so-gehts" class="steps">
+  <h2>So geht's</h2>
+  <ol>
+    <li>
+      <figure class="phone sm"><img src="assets/ergebnis.webp" width="585" height="1266" alt="Ergebnis eintragen: Spieler und Satzergebnisse auswählen" loading="lazy"></figure>
+      <h3><span>1</span> Spiel eintragen</h3>
+      <p>Einzel oder Doppel, Spieler wählen, Sätze eintippen. Dauert ein paar Sekunden.</p>
+    </li>
+    <li>
+      <figure class="phone sm"><img src="assets/matches.webp" width="585" height="1266" alt="Match-Feed mit bestätigten Ergebnissen und Siegerfotos" loading="lazy"></figure>
+      <h3><span>2</span> Gegner bestätigt</h3>
+      <p>Das andere Team bestätigt das Ergebnis. Ohne Rückmeldung gilt es nach 24 Stunden als bestätigt.</p>
+    </li>
+    <li>
+      <figure class="phone sm"><img src="assets/liste.webp" width="585" height="1266" alt="Rangliste als Liste mit Punkten aller Spieler" loading="lazy"></figure>
+      <h3><span>3</span> Punkte sammeln</h3>
+      <p>Du spielst in deiner Liga – Rookie, Smash oder Elite. Pro Saison zählen deine 6 besten Spiele.</p>
+    </li>
+  </ol>
+</section>
+
+<section id="hallen" class="halls">
+  <div>
+    <h2>Für Hallen</h2>
+    <p>Eure Spieler wollen wissen, wer vorne liegt. Mit PadelRun bekommt eure Halle eine eigene Rangliste – mit Ligen, Saisons und einem Aushang, über den Spieler per QR-Code beitreten.</p>
+    <p>Für Hallen, die jetzt in der Startphase dabei sind, ist PadelRun kostenlos.</p>
+    <p><a class="btn" href="mailto:padelrun.app@gmail.com?subject=PadelRun%20f%C3%BCr%20unsere%20Halle">Halle anmelden</a></p>
+  </div>
+  <figure class="poster"><img src="assets/aushang.webp" width="620" height="877" alt="Aushang für die Halle mit QR-Code zum Beitreten" loading="lazy"></figure>
+</section>
+
+<section id="fragen" class="faq">
+  <h2>Häufige Fragen</h2>
+  <details><summary>Was ist PadelRun?</summary><p>PadelRun ist eine App, mit der jede Padel-Halle ihre eigene Rangliste bekommt. Spieler tragen ihre Matches ein, das gegnerische Team bestätigt das Ergebnis, und alle sammeln Punkte in ihrer Liga.</p></details>
+  <details><summary>Wie trage ich ein Ergebnis ein?</summary><p>In der App auf „Ergebnis“ tippen, Einzel oder Doppel wählen, die Spieler auswählen und senden. Das gegnerische Team bestätigt. Ohne Rückmeldung wird das Ergebnis nach 24 Stunden automatisch bestätigt.</p></details>
+  <details><summary>Welche Ligen gibt es?</summary><p>Es gibt drei Ligen nach Spielstärke: Rookie, Smash und Elite. So spielst du um Punkte gegen Leute auf deinem Niveau.</p></details>
+  <details><summary>Wie wird die Rangliste berechnet?</summary><p>Pro Saison zählen deine 6 punktstärksten Spiele. Bei Punktgleichstand entscheiden mindestens 6 Spiele, dann die höhere Siegquote, dann wer die Punktzahl zuerst erreicht hat.</p></details>
+  <details><summary>Geht PadelRun auch im Doppel und mit Gästen?</summary><p>Ja. Du kannst Einzel und Doppel eintragen. Im Doppel darf ein Spieler ohne App als Gast mitspielen; der Gast bekommt keine Punkte.</p></details>
+  <details><summary>Wann und wo gibt es die App?</summary><p>PadelRun kommt bald in den App Store für iPhone. Aktuell testen wir mit den ersten Spielern. Neuigkeiten gibt es auf Instagram unter <a href="https://www.instagram.com/padel.run/">@padel.run</a>.</p></details>
+  <details><summary>Was kostet PadelRun für Hallen?</summary><p>Für Hallen, die in der Startphase dabei sind, ist PadelRun kostenlos. Die Halle bekommt eine eigene Rangliste und einen Aushang mit QR-Code, über den Spieler beitreten.</p></details>
+  <details><summary>Wie trete ich der Rangliste meiner Halle bei?</summary><p>Über den QR-Code auf dem Aushang in deiner Halle oder mit dem Hallencode, den du an der Theke oder von Mitspielern bekommst.</p></details>
+  <details><summary>Brauche ich PadelRun, wenn ich schon Playtomic nutze?</summary><p>Playtomic nutzt du zum Buchen von Courts, und es zeigt dein persönliches Level. PadelRun ergänzt das: eine gemeinsame Rangliste für alle Spieler deiner Halle, mit Ligen und Saisons. Du kannst beides parallel nutzen.</p></details>
+  <p class="more">Noch Fragen? <a href="support.html">Hilfe &amp; Kontakt</a></p>
+</section>
+
+</main>
+
+<footer class="foot">
+  <p><strong>PadelRun</strong> · Sören Meldau</p>
+  <nav aria-label="Rechtliches"><a href="support.html">Hilfe &amp; Kontakt</a><a href="impressum.html">Impressum</a><a href="datenschutz.html">Datenschutz</a><a href="nutzungsbedingungen.html">Nutzungsbedingungen</a></nav>
+</footer>
+
+</body>
+</html>

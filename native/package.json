@@ -1,0 +1,21 @@
+{
+  "name": "padelrun-ios",
+  "version": "1.0.0",
+  "private": true,
+  "description": "PadelRun – iPhone-App (Capacitor). Start ohne Werbung und ohne Premium.",
+  "scripts": {
+    "build": "node scripts/build-www.mjs",
+    "sync": "npm run build && npx cap sync ios"
+  },
+  "dependencies": {
+    "@capacitor/core": "^8.0.0",
+    "@capacitor/ios": "^8.0.0",
+    "@capacitor/browser": "^8.0.0",
+    "@capacitor/push-notifications": "^8.0.0",
+    "@capacitor-community/apple-sign-in": "^7.0.0",
+    "@atroo/capacitor-secure-storage-plugin": "^8.0.0"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "^8.0.0"
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "supabaseUrl": "https://qnvevifgvplmqpwzsuca.supabase.co",
+  "supabaseAnonKey": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFudmV2aWZndnBsbXFwd3pzdWNhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTMxNzk4OTgsImV4cCI6MjEwODc1NTg5OH0.wbgfCuaolPsjObiPoK5EoBChsSGM4dw6rdGutbvvmm4",
+  "appleClientId": "de.padelup.app",
+  "revenueCatIosKey": "",
+  "admobBannerIos": "",
+  "admobTesting": true
+}

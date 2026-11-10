@@ -1,0 +1,9 @@
+{
+  "appId": "de.padelup.app",
+  "appName": "PadelRun",
+  "webDir": "www",
+  "ios": { "contentInset": "never", "scheme": "PADELUP" },
+  "plugins": {
+    "PushNotifications": { "presentationOptions": ["badge", "sound", "alert"] }
+  }
+}
