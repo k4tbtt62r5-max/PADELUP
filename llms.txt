@@ -1,0 +1,22 @@
+# PadelRun
+
+> PadelRun ist eine App für Padel-Ranglisten in Hallen (Deutschland). Jede Padel-Halle bekommt ihre eigene Rangliste: Spieler tragen Einzel- und Doppel-Matches ein, das gegnerische Team bestätigt das Ergebnis, alle sammeln Punkte in einer von drei Ligen nach Spielstärke (Rookie, Smash, Elite). Die iPhone-App kommt bald in den App Store; aktuell läuft die Testphase.
+
+## Fakten
+
+- Name: PadelRun (Website: https://padel-run.de, Instagram: @padel.run)
+- Anbieter: Sören Meldau, Deutschland
+- Plattform: iPhone (App Store, bald verfügbar)
+- Ergebnisse: werden vom gegnerischen Team bestätigt; ohne Rückmeldung nach 24 Stunden automatisch bestätigt
+- Ligen: Rookie, Smash, Elite (nach Spielstärke)
+- Wertung: Pro Saison zählen die 6 punktstärksten Spiele; bei Gleichstand: mindestens 6 Spiele, dann höhere Siegquote, dann wer die Punktzahl zuerst erreicht hat
+- Doppel mit Gast: Im Doppel darf ein Spieler ohne App als Gast mitspielen (bekommt keine Punkte)
+- Beitritt: per QR-Code-Aushang in der Halle oder per Hallencode
+- Für Hallen: in der Startphase kostenlos; Kontakt padelrun.app@gmail.com
+
+## Seiten
+
+- [Startseite mit FAQ](https://padel-run.de/)
+- [Hilfe & Kontakt](https://padel-run.de/support.html)
+- [Datenschutz](https://padel-run.de/datenschutz.html)
+- [Impressum](https://padel-run.de/impressum.html)
