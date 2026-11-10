@@ -12,6 +12,7 @@
 - Wertung: Pro Saison zählen die 6 punktstärksten Spiele; bei Gleichstand: mindestens 6 Spiele, dann höhere Siegquote, dann wer die Punktzahl zuerst erreicht hat
 - Doppel mit Gast: Im Doppel darf ein Spieler ohne App als Gast mitspielen (bekommt keine Punkte)
 - Beitritt: per QR-Code-Aushang in der Halle oder per Hallencode
+- Verhältnis zu Playtomic: Playtomic dient zum Buchen und zeigt das persönliche Level; PadelRun ist eine gemeinsame Rangliste aller Spieler einer Halle mit Ligen und Saisons – beides parallel nutzbar
 - Für Hallen: in der Startphase kostenlos; Kontakt padelrun.app@gmail.com
 
 ## Seiten
