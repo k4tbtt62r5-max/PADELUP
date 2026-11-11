@@ -8,7 +8,7 @@ on:
 
 jobs:
   testflight:
-    runs-on: macos-15
+    runs-on: macos-26
     timeout-minutes: 60
     defaults:
       run:
@@ -29,6 +29,14 @@ jobs:
           done
           for v in APPLE_TEAM_ID ASC_KEY_ID ASC_ISSUER_ID; do [ -n "${!v}" ] || { echo "::error::Secret $v fehlt"; exit 1; }; done
           [ -n "${{ secrets.ASC_KEY_P8 }}" ] || { echo "::error::Secret ASC_KEY_P8 fehlt"; exit 1; }
+
+      - name: Neuestes Xcode wählen
+        run: |
+          ls -d /Applications/Xcode*.app
+          X=$(ls -d /Applications/Xcode_*.app | grep -E 'Xcode_[0-9.]+\.app$' | sort -V | tail -1)
+          sudo xcode-select -s "$X/Contents/Developer"
+          xcodebuild -version
+          xcodebuild -showsdks | grep -i iphoneos
 
       - uses: actions/setup-node@v4
         with:
