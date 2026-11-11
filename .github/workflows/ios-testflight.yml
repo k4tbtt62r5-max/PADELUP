@@ -22,6 +22,11 @@ jobs:
 
       - name: Secrets prüfen
         run: |
+          for v in APPLE_TEAM_ID ASC_KEY_ID ASC_ISSUER_ID; do
+            raw="${!v}"; clean="$(printf '%s' "$raw" | tr -d '[:space:]')"
+            echo "$v: Länge ${#raw}, ohne Leerzeichen ${#clean}"
+            echo "$v=$clean" >> "$GITHUB_ENV"
+          done
           for v in APPLE_TEAM_ID ASC_KEY_ID ASC_ISSUER_ID; do [ -n "${!v}" ] || { echo "::error::Secret $v fehlt"; exit 1; }; done
           [ -n "${{ secrets.ASC_KEY_P8 }}" ] || { echo "::error::Secret ASC_KEY_P8 fehlt"; exit 1; }
 
