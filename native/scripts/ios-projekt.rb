@@ -14,6 +14,26 @@ File.write(File.join(icon_dir, 'Contents.json'), JSON.pretty_generate({
   'images' => [{ 'filename' => 'AppIcon-1024.png', 'idiom' => 'universal', 'platform' => 'ios', 'size' => '1024x1024' }],
   'info' => { 'author' => 'xcode', 'version' => 1 }
 }))
+# Push: Geräte-Kennung von iOS an Capacitor weiterreichen (fehlt in der Capacitor-Vorlage)
+delegate = File.join(root, 'App/AppDelegate.swift')
+d = File.read(delegate)
+unless d.include?('capacitorDidRegisterForRemoteNotifications')
+  hook = <<~SWIFT
+
+    func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
+        NotificationCenter.default.post(name: .capacitorDidRegisterForRemoteNotifications, object: deviceToken)
+    }
+
+    func application(_ application: UIApplication, didFailToRegisterForRemoteNotificationsWithError error: Error) {
+        NotificationCenter.default.post(name: .capacitorDidFailToRegisterForRemoteNotifications, object: error)
+    }
+  SWIFT
+  i = d.rindex('}')
+  d = d[0...i] + hook.gsub(/^/, '    ').sub(/\A    \n/, "\n") + "}\n"
+  File.write(delegate, d)
+  puts 'AppDelegate: Push-Weiterleitung ergänzt'
+end
+
 proj = Xcodeproj::Project.open(File.join(root, 'App.xcodeproj'))
 target = proj.targets.find { |t| t.name == 'App' }
 group = proj.main_group.find_subpath('App', true)
