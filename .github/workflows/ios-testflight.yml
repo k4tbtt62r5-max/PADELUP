@@ -53,6 +53,32 @@ jobs:
           printf '%s' "${{ secrets.ASC_KEY_P8 }}" > "$RUNNER_TEMP/asc/AuthKey.p8"
           chmod 600 "$RUNNER_TEMP/asc/AuthKey.p8"
 
+      - name: Schlüssel prüfen (ohne Inhalt anzuzeigen)
+        run: |
+          K="$RUNNER_TEMP/asc/AuthKey.p8"
+          echo "Zeilen: $(wc -l < "$K" | tr -d ' ')"
+          head -1 "$K" | grep -q 'BEGIN PRIVATE KEY' && echo "Anfang ok" || echo "::warning::Erste Zeile ist nicht BEGIN PRIVATE KEY"
+          grep -q 'END PRIVATE KEY' "$K" && echo "Ende ok" || echo "::warning::END PRIVATE KEY fehlt"
+          grep -q $'\r' "$K" && echo "::warning::Windows-Zeilenenden" || true
+          openssl pkey -in "$K" -noout 2>/dev/null && echo "Schlüssel lesbar" || echo "::warning::Schlüssel nicht lesbar"
+          cat > "$RUNNER_TEMP/jwt.rb" <<'RB'
+          require 'openssl'; require 'base64'; require 'json'; require 'net/http'
+          k = OpenSSL::PKey.read(File.read(ARGV[0]))
+          b = ->(x){ Base64.urlsafe_encode64(x, padding: false) }
+          h = b.(JSON.dump({alg:'ES256', kid:ENV['ASC_KEY_ID'], typ:'JWT'}))
+          t = Time.now.to_i
+          pl = b.(JSON.dump({iss:ENV['ASC_ISSUER_ID'], iat:t, exp:t+600, aud:'appstoreconnect-v1'}))
+          der = k.sign(OpenSSL::Digest::SHA256.new, "#{h}.#{pl}")
+          a = OpenSSL::ASN1.decode(der).value.map{|i| i.value.to_s(2).rjust(32, "\0")[-32,32] }.join
+          jwt = "#{h}.#{pl}.#{b.(a)}"
+          u = URI('https://api.appstoreconnect.apple.com/v1/apps?fields[apps]=bundleId&limit=5')
+          r = Net::HTTP.start(u.host, 443, use_ssl: true){|x| x.get(u.request_uri, 'Authorization' => "Bearer #{jwt}") }
+          puts "API-Test: HTTP #{r.code}"
+          puts r.body[0,600] if r.code != '200'
+          puts JSON.parse(r.body)['data'].map{|d| d['attributes']['bundleId']}.inspect if r.code == '200'
+          RB
+          ruby "$RUNNER_TEMP/jwt.rb" "$K" || true
+
       - name: Archiv bauen (signiert)
         run: |
           cd ios/App
