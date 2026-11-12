@@ -1,0 +1,10 @@
+<!doctype html><html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex"><title>PadelRun laden</title>
+<script>
+// Ziel für iPhone: App-Store-Link (wird beim Start eingetragen). Bis dahin: Web-App.
+var APPSTORE = "";
+var ios = /iPhone|iPad|iPod/.test(navigator.userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+location.replace(ios && APPSTORE ? APPSTORE : "/app/");
+</script>
+<style>body{font:17px -apple-system,sans-serif;background:#0e1b3d;color:#fff;display:grid;place-items:center;min-height:100vh;margin:0}a{color:#c8f31d}</style>
+</head><body><p>Weiter zu <a href="/app/">PadelRun</a> …</p></body></html>
