@@ -35,7 +35,7 @@ if(code){
   document.getElementById('t').textContent='Du wurdest in eine Halle eingeladen.';
   document.getElementById('s').textContent='Lade PadelRun und tritt mit diesem Code bei:';
   document.getElementById('cd').style.display='block';document.getElementById('cv').textContent=code;
-  w.href='/app/#join='+encodeURIComponent(code);w.textContent='Im Browser beitreten';
+  w.href='/app/#join='+encodeURIComponent(code)+'&web=1';w.textContent='Im Browser beitreten';
   a.addEventListener('click',function(){try{navigator.clipboard.writeText(code)}catch(e){}});
 }
 if(APPSTORE){a.href=APPSTORE;if(code)h.textContent='Tipp: Der Code wird beim Tippen kopiert. In der App unter „Halle beitreten“ einfügen.';}
