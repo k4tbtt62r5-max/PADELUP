@@ -20,8 +20,9 @@ img.ph{width:230px;border-radius:30px;margin-top:30px;box-shadow:0 24px 50px -20
 <small id=hint></small>
 <img class=ph src="/assets/rangliste.webp" alt="PadelRun Rangliste">
 <script>
-// App-Store-Link wird am Starttag eingetragen.
-var APPSTORE = "";
+// Am Starttag LIVE auf true setzen – dann wird der App-Store-Knopf aktiv.
+var LIVE = false;
+var APPSTORE = LIVE ? "https://apps.apple.com/de/app/id6833491873" : "";
 var ios=/iPhone|iPad|iPod/.test(navigator.userAgent)||(navigator.platform==="MacIntel"&&navigator.maxTouchPoints>1);
 var a=document.getElementById('ios'),w=document.getElementById('web'),h=document.getElementById('hint');
 if(APPSTORE){a.href=APPSTORE;}else{a.textContent="Bald im App Store";a.className="btn soon";a.removeAttribute('href');}
