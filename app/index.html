@@ -2,7 +2,7 @@
 <html lang="de">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><meta name="apple-itunes-app" content="app-id=6833491873">
 <title>PadelRun</title>
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
@@ -1527,7 +1527,7 @@ try{if(window.visualViewport){visualViewport.addEventListener('resize',navFix);v
  window.addEventListener('pageshow',()=>setTimeout(navFix,50))}catch(e){}
 /* ===== Einladen per Link und QR-Code ===== */
 const APP_URL='https://padel-run.de/app/';
-function joinUrl(c){return APP_URL+'#join='+encodeURIComponent(c)}
+function joinUrl(c){return 'https://padel-run.de/laden#join='+encodeURIComponent(c)}
 function qrSvg(t,sz){const q=new QRLIB(-1,0);q.addData(t);q.make();const n=q.getModuleCount(),b=4,N=n+2*b;let d='';for(let r=0;r<n;r++)for(let c=0;c<n;c++)if(q.isDark(r,c))d+='M'+(c+b)+' '+(r+b)+'h1v1h-1z';
  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${N} ${N}" width="${sz}" height="${sz}" shape-rendering="crispEdges" role="img" aria-label="QR-Code"><rect width="${N}" height="${N}" fill="#fff"/><path d="${d}" fill="#000"/></svg>`}
 function joinGet(){let c=null;try{const m=(location.hash||'').match(/join=([A-Za-z0-9]{4,12})/)||(location.search||'').match(/[?&]join=([A-Za-z0-9]{4,12})/);
@@ -2260,7 +2260,7 @@ function themeSet(t){lsSet('padel_theme',t);themeApply();render()}
 try{matchMedia('(prefers-color-scheme: dark)').addEventListener('change',()=>{if(themeGet()=='auto')themeApply()})}catch(e){}
 function themeCard(){const t=themeGet(),b=(k,l)=>`<button type="button" class="${t==k?'on':''}" onclick="themeSet('${k}')">${l}</button>`;return `<div class="card"><h3>🌓 Darstellung</h3><div class="thm">${b('auto','Automatisch')}${b('light','☀️ Hell')}${b('dark','🌙 Dunkel')}</div><div class="sub" style="margin-top:6px">„Automatisch“ folgt der Einstellung deines iPhones.</div></div>`}
 /* ===== Automatische Aktualisierung (nur Website-Version): neue Version erkennen und neu laden ===== */
-const APP_VERSION='20261113-110030';
+const APP_VERSION='20261113-162222';
 async function updCheck(){if(NATIVE||!SB.live||APP_VERSION=='dev'||document.hidden)return;
  try{const r=await fetch('version.json?ts='+Date.now(),{cache:'no-store'});if(!r.ok)return;const v=(await r.json()).v;if(!v||v==APP_VERSION)return;
   let tried=null;try{tried=sessionStorage.getItem('padel_upd')}catch(e){}if(tried==v)return;
