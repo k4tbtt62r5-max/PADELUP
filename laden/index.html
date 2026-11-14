@@ -39,7 +39,7 @@ if(code){
   a.addEventListener('click',function(){try{navigator.clipboard.writeText(code)}catch(e){}});
 }
 if(APPSTORE){a.href=APPSTORE;if(code)h.textContent='Tipp: Der Code wird beim Tippen kopiert. In der App unter „Halle beitreten“ einfügen.';}
-else{a.textContent="Bald im App Store";a.className="btn soon";a.removeAttribute('href');}
+else{a.textContent=(Date.now()<Date.UTC(2026,10,16,5,0)?"Ab Montag im App Store":"Bald im App Store");a.className="btn soon";a.removeAttribute('href');}
 if(!ios||!APPSTORE){ // Android & Co oder vor dem Start: Browser zuerst
   w.className="btn main";a.parentNode.insertBefore(w,a);
   if(APPSTORE){a.className="btn sec";a.textContent="iPhone? Im App Store laden";}
