@@ -1,0 +1,21 @@
+# Prüft jeden Morgen, ob Website, Web-App, Links und Server funktionieren.
+# Bei einem Fehler schickt GitHub automatisch eine Mail.
+name: Täglicher Check
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "17 5 * * *"   # täglich ca. 6:17 Uhr (Winterzeit)
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
+      - run: pip install playwright && python -m playwright install --with-deps chromium
+      - run: python scripts/taeglicher_check.py
+      - if: always()
+        run: cat check_bericht.md >> "$GITHUB_STEP_SUMMARY"
