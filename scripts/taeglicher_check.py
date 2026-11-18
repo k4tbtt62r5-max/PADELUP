@@ -71,7 +71,7 @@ with sync_playwright() as p:
             for sel, was in [("#ae", "E-Mail-Feld"), ("#ap", "Passwort-Feld"), ('#login button:text-is("Anmelden")', "Knopf „Anmelden“")]:
                 if pg.locator(sel).count() == 0: FEHLER.append(f"App ({name}): {was} fehlt")
             t = pg.inner_text("#login")
-            for wort in ["Passwort vergessen", "Registrieren"]:
+            for wort in ["Passwort vergessen", "Konto erstellen"]:
                 if wort not in t: FEHLER.append(f"App ({name}): „{wort}“ fehlt auf der Anmeldeseite")
             # Falsches Passwort → verständliche Fehlermeldung (keine echte Anmeldung)
             pg.fill("#ae", "check-gibt-es-nicht@padel-run.de"); pg.fill("#ap", "falsch123456")
