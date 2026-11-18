@@ -1683,7 +1683,7 @@ async function emailSignup(){if(window._ab)return;const em=document.getElementBy
   if(!r.ok){msg(authErr(r));return}
   if(r.json&&r.json.access_token){setSess(r.json);await afterLogin()}else msg('Fast geschafft: Wir haben dir eine E-Mail geschickt. Bitte bestätige sie und melde dich danach an.')}finally{window._ab=false}}
 async function resetPw(){const em=document.getElementById('ae').value.trim();if(!MAIL.test(em)){msg('Bitte gib oben deine E-Mail-Adresse ein.');return}
- const r=await sbFetch('/auth/v1/recover',{method:'POST',body:{email:em}});if(r.error)msg(authErr(r));else msg('Falls es ein Konto mit dieser E-Mail gibt, haben wir dir einen Link zum Zurücksetzen geschickt.')}
+ const r=await sbFetch('/auth/v1/recover?redirect_to='+encodeURIComponent('https://padel-run.de/app/'),{method:'POST',body:{email:em}});if(r.error)msg(authErr(r));else msg('Falls es ein Konto mit dieser E-Mail gibt, haben wir dir einen Link zum Zurücksetzen geschickt.')}
 async function sha256hex(t){const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(t));return[...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('')}
 function rnd(n){const a=new Uint8Array(n);crypto.getRandomValues(a);return[...a].map(x=>x.toString(16).padStart(2,'0')).join('')}
 async function appleAuthorize(){const P=window.Capacitor&&window.Capacitor.Plugins&&window.Capacitor.Plugins.SignInWithApple;if(!P)throw new Error('no_plugin');
@@ -2260,7 +2260,7 @@ function themeSet(t){lsSet('padel_theme',t);themeApply();render()}
 try{matchMedia('(prefers-color-scheme: dark)').addEventListener('change',()=>{if(themeGet()=='auto')themeApply()})}catch(e){}
 function themeCard(){const t=themeGet(),b=(k,l)=>`<button type="button" class="${t==k?'on':''}" onclick="themeSet('${k}')">${l}</button>`;return `<div class="card"><h3>🌓 Darstellung</h3><div class="thm">${b('auto','Automatisch')}${b('light','☀️ Hell')}${b('dark','🌙 Dunkel')}</div><div class="sub" style="margin-top:6px">„Automatisch“ folgt der Einstellung deines iPhones.</div></div>`}
 /* ===== Automatische Aktualisierung (nur Website-Version): neue Version erkennen und neu laden ===== */
-const APP_VERSION='20261117-205611';
+const APP_VERSION='20261118-154213';
 async function updCheck(){if(NATIVE||!SB.live||APP_VERSION=='dev'||document.hidden)return;
  try{const r=await fetch('version.json?ts='+Date.now(),{cache:'no-store'});if(!r.ok)return;const v=(await r.json()).v;if(!v||v==APP_VERSION)return;
   let tried=null;try{tried=sessionStorage.getItem('padel_upd')}catch(e){}if(tried==v)return;
@@ -2285,7 +2285,19 @@ function closeM(){if(TOS_OPEN)return;document.getElementById("modal").classList.
 async function resetAll(){if(await ask("Alle Daten zurücksetzen?","Zurücksetzen",1)){S=seedAll();save();view="rank";render()}}
 window.addEventListener('storage',e=>{if(e.key=='padel3')reloadS()});{const mp=mine();if(mp){S.hall=mp.hall;cur=mp.league}}
 AD.wait=!!(SB.live&&(A.session||secPlugin()));if(AD.wait)setTimeout(()=>{if(AD.wait){AD.wait=false;render()}},5000);
-SEC_READY.then(()=>{const sp=!!secPlugin();if(sp)AD.wait=!!(SB.live&&A.session);if(A.session&&view=='login')view='rank';if(isR())remoteLoad().then(()=>render());if(sp&&A.session){billInit();syncPremium().then(()=>render())}render()});setInterval(()=>{if(isR()&&!document.hidden)remoteLoad().then(()=>render())},12e4);
+const RECOV=(function(){try{const h=(location.hash||'').replace(/^#/,'');if(!/(^|&)(access_token|error|error_code)=/.test(h))return null;const p=new URLSearchParams(h);history.replaceState(null,'',location.pathname+location.search);return p}catch(e){return null}})();
+async function recovInit(){if(!RECOV)return;const at=RECOV.get('access_token'),ty=RECOV.get('type');
+ if(!at){view=A.session?'rank':'login';setTimeout(()=>msg('Der Link ist abgelaufen oder wurde schon benutzt. Bitte fordere unter „Passwort vergessen?“ einen neuen an.'),300);return}
+ const x=setSess({access_token:at,refresh_token:RECOV.get('refresh_token'),expires_in:+(RECOV.get('expires_in')||3600),user:null});
+ try{const u=await sbFetch('/auth/v1/user',{token:at});if(u.ok&&u.json){x.user=u.json;saveSess(x)}}catch(e){}
+ if(view=='login')view='rank';if(ty=='recovery')setTimeout(pwSheet,400)}
+function pwSheet(){sheet(`<h3>Neues Passwort festlegen</h3><div class='sub' style='margin-bottom:10px'>Mindestens 8 Zeichen.</div><input id='np1' type='password' autocomplete='new-password' placeholder='Neues Passwort' style='margin-bottom:8px'><input id='np2' type='password' autocomplete='new-password' placeholder='Passwort wiederholen' style='margin-bottom:12px'><button class='btn' onclick='setNewPw()'>Passwort speichern</button>`)}
+async function setNewPw(){if(window._pwb)return;const a=document.getElementById('np1').value,b=document.getElementById('np2').value;
+ if(a.length<8){toast('Das Passwort muss mindestens 8 Zeichen lang sein.');return}if(a!==b){toast('Die beiden Passwörter sind nicht gleich.');return}
+ window._pwb=true;try{const t=await freshToken();const r=await sbFetch('/auth/v1/user',{method:'PUT',token:t,body:{password:a}});
+  if(r.ok){closeM();msg('Dein Passwort wurde geändert ✅ Du bist jetzt angemeldet.')}else{const j=r.json||{};toast((j.error_code||j.code)=='same_password'?'Das neue Passwort muss sich vom alten unterscheiden.':authErr(r)||'Speichern fehlgeschlagen. Bitte versuche es nochmal.')}}
+ finally{window._pwb=false}}
+SEC_READY.then(async()=>{await recovInit();const sp=!!secPlugin();if(sp)AD.wait=!!(SB.live&&A.session);if(A.session&&view=='login')view='rank';if(isR())remoteLoad().then(()=>render());if(sp&&A.session){billInit();syncPremium().then(()=>render())}render()});setInterval(()=>{if(isR()&&!document.hidden)remoteLoad().then(()=>render())},12e4);
 if(!secPlugin()){billInit();if(A.session)syncPremium().then(()=>render())}loadAds().then(()=>{if(view=='feed')render()});setInterval(()=>{loadAds().then(()=>{if(view=='feed')render()})},18e5);
 joinGet();dbInit();
 tick();(function(){const c=document.querySelectorAll('#add .card')[1],r=document.createElement('div');r.id='res';r.className='hide';r.appendChild(c);document.getElementById('add').after(r)})();render();setTimeout(seasonPrompt,400);setInterval(()=>{if(tick()){render();seasonPrompt()}else{renderSeason();if(view=='feed')render()}},60000);
