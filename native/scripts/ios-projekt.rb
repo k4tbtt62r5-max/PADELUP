@@ -48,7 +48,7 @@ target.build_configurations.each do |c|
   s['DEVELOPMENT_TEAM'] = team
   s['CODE_SIGN_STYLE'] = 'Automatic'
   s['PRODUCT_BUNDLE_IDENTIFIER'] = 'de.padelup.app'
-  s['MARKETING_VERSION'] = '1.0.0'
+  s['MARKETING_VERSION'] = '1.0.1'
   s['TARGETED_DEVICE_FAMILY'] = '1'
   s['INFOPLIST_KEY_CFBundleDisplayName'] = 'PadelRun'
 end
